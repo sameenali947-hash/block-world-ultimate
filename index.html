@@ -1,466 +1,484 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BLOCK WORLD ULTIMATE</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BLOCK WORLD: ULTIMATE</title>
 <style>
-* { box-sizing:border-box; }
-body {
-  margin:0;
-  background:linear-gradient(#61caff,#b6edff);
-  font-family:Arial,sans-serif;
-  text-align:center;
-  color:white;
-}
-h1 {
-  font-size:32px;
-  text-shadow:3px 3px #3975a8;
-  margin:15px;
-}
-#menu { padding:10px; }
-.modes {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:10px;
-  max-width:800px;
-  margin:15px auto;
-}
-button {
-  border:0;
-  border-radius:12px;
-  padding:13px 18px;
-  font-weight:bold;
-  font-size:15px;
-  background:#ffca48;
-  cursor:pointer;
-  box-shadow:0 4px #b47d18;
-}
-button:hover { transform:scale(1.04); }
-#hud {
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:20px;
-  font-size:17px;
-  font-weight:bold;
-  margin:12px;
-}
-canvas {
-  display:block;
-  width:min(95%,850px);
-  height:auto;
-  margin:auto;
-  border:5px solid white;
-  border-radius:12px;
-  background:#9de6ff;
-}
-#controls {
-  margin:15px;
-}
-#controls button {
-  min-width:65px;
-  font-size:20px;
-}
-#status { font-weight:bold; margin:12px; }
-.hidden { display:none !important; }
+*{box-sizing:border-box}
+body{margin:0;overflow:hidden;font-family:Arial,sans-serif;background:#78d5ff;color:white}
+#game{position:fixed;inset:0}
+#menu{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:linear-gradient(#164477aa,#101c42dd)}
+.panel{background:#182b50ed;padding:30px;border:2px solid #ffffff55;border-radius:25px;width:min(850px,94vw);text-align:center;box-shadow:0 20px 60px #10204499}
+h1{font-size:clamp(32px,6vw,58px);margin:5px;color:#ffdf55;text-shadow:0 5px #a65c25}
+p{color:#d5e7ff}
+.modes{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:25px}
+button{border:0;border-radius:15px;padding:15px 8px;color:white;font-weight:bold;font-size:15px;cursor:pointer;background:linear-gradient(#579bff,#3154a7);box-shadow:0 5px #203c79}
+button:hover{filter:brightness(1.2);transform:translateY(-2px)}
+.mode{min-height:115px;font-size:17px}
+.mode span{display:block;font-size:35px;margin-bottom:8px}
+#hud{position:fixed;top:15px;left:15px;right:15px;display:none;gap:10px;align-items:center;flex-wrap:wrap;z-index:3}
+.stat{background:#172b50dd;border:1px solid #ffffff55;padding:12px 15px;border-radius:12px;font-weight:bold}
+#objective{position:fixed;top:78px;left:50%;transform:translateX(-50%);background:#172b50dd;padding:12px 18px;border-radius:12px;z-index:3;text-align:center}
+#menuButton{margin-left:auto;background:#ed5d70}
+#message{position:fixed;top:35%;left:50%;transform:translate(-50%,-50%);background:#172b50;padding:18px 25px;border-radius:15px;display:none;z-index:8;font-weight:bold;text-align:center}
+#controls{position:fixed;bottom:20px;left:15px;right:15px;display:none;justify-content:space-between;z-index:4}
+.control{font-size:25px;padding:18px;background:#172b50cc;touch-action:none}
+#help{position:fixed;bottom:15px;right:15px;background:#172b50cc;padding:10px;border-radius:10px;z-index:3}
+@media(max-width:650px){.modes{grid-template-columns:repeat(2,1fr)}.mode:last-child{grid-column:span 2}#help{display:none}.control{padding:16px}#controls{display:flex}}
 </style>
 </head>
 <body>
-
-<h1>🌎 BLOCK WORLD ULTIMATE</h1>
+<div id="game"></div>
 
 <div id="menu">
-  <h2>Choose Your Game!</h2>
+ <div class="panel">
+  <h1>BLOCK WORLD</h1>
+  <h2>ULTIMATE 🌎</h2>
+  <p>Explore • Build • Survive • Become a legend!</p>
   <div class="modes">
-    <button onclick="start('obby')">🏃 OBBY</button>
-    <button onclick="start('simulator')">🪙 SIMULATOR</button>
-    <button onclick="start('survival')">❤️ SURVIVAL</button>
-    <button onclick="start('tycoon')">🏗️ TYCOON</button>
-    <button onclick="start('roleplay')">🏡 ROLEPLAY</button>
+   <button class="mode" onclick="start('obby')"><span>🏃</span>OBBY</button>
+   <button class="mode" onclick="start('simulator')"><span>🪙</span>SIMULATOR</button>
+   <button class="mode" onclick="start('survival')"><span>🛡️</span>SURVIVAL</button>
+   <button class="mode" onclick="start('tycoon')"><span>🏗️</span>TYCOON</button>
+   <button class="mode" onclick="start('roleplay')"><span>🏡</span>ROLEPLAY</button>
   </div>
-  <p>Welcome to Block World! Pick your adventure.</p>
+  <p>WASD to move • SPACE to jump • E to interact</p>
+ </div>
 </div>
 
-<div id="game" class="hidden">
-  <div id="hud">
-    <span id="mode">Game</span>
-    <span id="hp">❤️ 100</span>
-    <span id="coins">🪙 0</span>
-    <span id="level">⭐ Level 1</span>
-  </div>
-
-  <canvas id="canvas" width="850" height="480"></canvas>
-
-  <div id="status">Have fun!</div>
-
-  <div id="controls">
-    <button onpointerdown="press('left')" onpointerup="release('left')" onpointerleave="release('left')">⬅️</button>
-    <button onpointerdown="press('right')" onpointerup="release('right')" onpointerleave="release('right')">➡️</button>
-    <button onclick="jump()">⬆️ JUMP</button>
-    <button onclick="interact()">E / USE</button>
-  </div>
-
-  <button onclick="goMenu()">🏠 MAIN MENU</button>
+<div id="hud">
+ <div class="stat" id="mode">🌎 WORLD</div>
+ <div class="stat" id="health">❤️ 100</div>
+ <div class="stat" id="coins">🪙 0</div>
+ <div class="stat" id="level">⭐ Level 1</div>
+ <button id="menuButton" onclick="goMenu()">☰ MENU</button>
+</div>
+<div id="objective"></div>
+<div id="message"></div>
+<div id="help">WASD Move | SPACE Jump | E Interact</div>
+<div id="controls">
+ <div>
+  <button class="control" data-key="a">◀</button>
+  <button class="control" data-key="d">▶</button>
+ </div>
+ <div>
+  <button class="control" onclick="jump()">⬆ JUMP</button>
+  <button class="control" onclick="interact()">E</button>
+ </div>
 </div>
 
-<script>
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
 
-let mode = "";
-let coins = 0;
-let hp = 100;
-let level = 1;
-let speed = 4;
-let playing = false;
-let frame = 0;
-let keys = {};
-let touch = {};
-let player = {x:70,y:350,w:30,h:42,vx:0,vy:0};
-let items = [];
-let enemies = [];
-let platforms = [];
-let buildings = 0;
-let lastDamage = 0;
+const scene=new THREE.Scene();
+scene.background=new THREE.Color(0x82d7ff);
+scene.fog=new THREE.Fog(0x82d7ff,35,100);
 
-const names = {
-  obby:"🏃 OBBY",
-  simulator:"🪙 SIMULATOR",
-  survival:"❤️ SURVIVAL",
-  tycoon:"🏗️ TYCOON",
-  roleplay:"🏡 ROLEPLAY"
+const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,200);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(innerWidth,innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+document.getElementById('game').appendChild(renderer.domElement);
+
+scene.add(new THREE.HemisphereLight(0xffffff,0x668855,2));
+const sun=new THREE.DirectionalLight(0xffffff,3);
+sun.position.set(-20,35,20);
+sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+scene.add(sun);
+
+const material=c=>new THREE.MeshStandardMaterial({color:c,roughness:.8});
+const grass=material(0x53bd62);
+const dirt=material(0x87552e);
+const blue=material(0x3479ee);
+const skin=material(0xffc18b);
+const dark=material(0x26334a);
+const gold=material(0xffd02e);
+const purple=material(0x9859e9);
+const red=material(0xf05b68);
+const green=material(0x27a86a);
+const white=material(0xffffff);
+
+let player,mode='obby',playing=false;
+let keys={},touch={},objects=[],coins=0,health=100,level=1;
+let speed=5,vy=0,onGround=false,buildings=0,frame=0;
+let clock=new THREE.Clock();
+
+function cube(x,y,z,w,h,d,mat,group=scene){
+ const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);
+ mesh.position.set(x,y,z);
+ mesh.castShadow=true;
+ mesh.receiveShadow=true;
+ group.add(mesh);
+ return mesh;
+}
+
+function clearWorld(){
+ for(const o of objects)scene.remove(o);
+ objects=[];
+}
+
+function addObject(o){
+ scene.add(o);
+ objects.push(o);
+ return o;
+}
+
+function makePlayer(){
+ const g=new THREE.Group();
+ cube(0,1.1,0,.8,.9,.5,blue,g);
+ cube(0,1.85,0,.62,.62,.62,skin,g);
+ cube(-.14,1.9,.32,.07,.08,.03,dark,g);
+ cube(.14,1.9,.32,.07,.08,.03,dark,g);
+ const legs=[];
+ legs.push(cube(-.22,.4,0,.3,.7,.35,dark,g));
+ legs.push(cube(.22,.4,0,.3,.7,.35,dark,g));
+ g.userData.legs=legs;
+ addObject(g);
+ return g;
+}
+
+function platform(x,y,z,w,d,mat=grass){
+ const p=cube(x,y,z,w,.6,d,mat);
+ p.userData.platform=true;
+ return p;
+}
+
+function makeCoin(x,z){
+ const g=new THREE.Group();
+ const m=new THREE.Mesh(
+  new THREE.CylinderGeometry(.4,.4,.13,16),
+  gold
+ );
+ m.rotation.x=Math.PI/2;
+ g.add(m);
+ const glow=new THREE.PointLight(0xffcf33,1,3);
+ g.add(glow);
+ g.position.set(x,1.2,z);
+ g.userData={coin:true};
+ addObject(g);
+}
+
+function tree(x,z){
+ cube(x,1,z,.5,2,.5,dirt);
+ cube(x,2.5,z,2,2,2,green);
+}
+
+function npc(x,z,mat=purple){
+ const g=new THREE.Group();
+ cube(0,1,0,.7,.9,.5,mat,g);
+ cube(0,1.75,0,.6,.6,.6,skin,g);
+ g.position.set(x,0,z);
+ g.userData.npc=true;
+ addObject(g);
+}
+
+function buildWorld(){
+ platform(0,-.4,0,50,50);
+ cube(0,-1.2,0,50,1.2,50,dirt);
+
+ for(let i=0;i<16;i++){
+  const a=i/16*Math.PI*2;
+  tree(Math.cos(a)*21,Math.sin(a)*21);
+ }
+}
+
+function start(selected){
+ mode=selected;
+ coins=0;
+ health=100;
+ level=1;
+ speed=5;
+ buildings=0;
+ frame=0;
+ vy=0;
+
+ clearWorld();
+ buildWorld();
+
+ player=makePlayer();
+ player.position.set(0,0,5);
+
+ if(mode==='obby'){
+  for(let i=0;i<9;i++){
+   const x=(i%2===0)?-2:2;
+   const z=-2-i*4;
+   platform(x,1+i*.3,z,3.5,3);
+   makeCoin(x,z);
+  }
+  platform(0,4,-40,8,8,gold);
+  cube(0,6,-40,2,4,.4,purple);
+ }else if(mode==='simulator'){
+  for(let i=0;i<25;i++){
+   makeCoin((Math.random()-.5)*35,(Math.random()-.5)*35);
+  }
+  platform(0,.1,-8,5,4,gold);
+ }else if(mode==='survival'){
+  for(let i=0;i<18;i++){
+   makeCoin((Math.random()-.5)*35,(Math.random()-.5)*35);
+  }
+  for(let i=0;i<5;i++){
+   npc((Math.random()-.5)*25,(Math.random()-.5)*25,purple);
+  }
+ }else if(mode==='tycoon'){
+  platform(0,.1,-10,13,12,dirt);
+  platform(0,.3,-16,4,3,gold);
+  for(let i=0;i<12;i++){
+   makeCoin((Math.random()-.5)*30,(Math.random()-.5)*30);
+  }
+ }else if(mode==='roleplay'){
+  for(let i=0;i<12;i++){
+   const x=(i%4-1.5)*9;
+   const z=-10-Math.floor(i/4)*10;
+   const h=3+(i%3)*2;
+   cube(x,h/2,z,5,h,5,[blue,red,purple,green][i%4]);
+  }
+  npc(-5,-5,purple);
+  npc(5,-12,red);
+  npc(0,7,green);
+  for(let i=0;i<12;i++){
+   makeCoin((Math.random()-.5)*30,(Math.random()-.5)*30);
+  }
+ }
+
+ document.getElementById('menu').style.display='none';
+ document.getElementById('hud').style.display='flex';
+ document.getElementById('objective').style.display='block';
+ document.getElementById('mode').textContent=selected.toUpperCase();
+ const goals={
+  obby:'Reach the finish platform!',
+  simulator:'Collect coins and upgrade your speed!',
+  survival:'Avoid danger and collect coins!',
+  tycoon:'Collect 15 coins and press E to build!',
+  roleplay:'Explore the city and meet people!'
+ };
+ document.getElementById('objective').textContent=goals[selected];
+ playing=true;
+ updateHUD();
+}
+
+function updateHUD(){
+ document.getElementById('health').textContent='❤️ '+health;
+ document.getElementById('coins').textContent='🪙 '+coins;
+ document.getElementById('level').textContent='⭐ Level '+level;
+}
+
+function say(text){
+ const m=document.getElementById('message');
+ m.textContent=text;
+ m.style.display='block';
+ setTimeout(()=>m.style.display='none',1800);
+}
+
+function jump(){
+ if(playing&&onGround){
+  vy=9;
+  onGround=false;
+ }
+}
+
+function interact(){
+ if(!playing)return;
+ if(mode==='simulator'){
+  if(coins>=10){
+   coins-=10;
+   speed+=1;
+   say('⚡ SPEED UPGRADED!');
+  }else say('You need 10 coins!');
+ }
+ if(mode==='tycoon'){
+  if(coins>=15){
+   coins-=15;
+   buildings++;
+   const x=-4+(buildings%3)*4;
+   const z=-10-Math.floor((buildings-1)/3)*4;
+   cube(x,2,z,3,4,3,[blue,red,purple,green][buildings%4]);
+   say('🏠 NEW BUILDING!');
+  }else say('You need 15 coins!');
+ }
+ if(mode==='roleplay')say('👋 Welcome to Block City!');
+}
+
+window.jump=jump;
+window.interact=interact;
+window.start=start;
+window.goMenu=()=>{
+ playing=false;
+ document.getElementById('menu').style.display='flex';
+ document.getElementById('hud').style.display='none';
+ document.getElementById('objective').style.display='none';
 };
 
-function start(selected) {
-  mode = selected;
-  coins = 0;
-  hp = 100;
-  level = 1;
-  speed = 4;
-  buildings = 0;
-  frame = 0;
-  player = {x:70,y:350,w:30,h:42,vx:0,vy:0};
-  items = [];
-  enemies = [];
-  touch = {};
-  playing = true;
+window.restart=()=>start(mode);
 
-  document.getElementById("menu").classList.add("hidden");
-  document.getElementById("game").classList.remove("hidden");
+window.addEventListener('keydown',e=>{
+ keys[e.key.toLowerCase()]=true;
+ if(e.code==='Space'){e.preventDefault();jump()}
+ if(e.key.toLowerCase()==='e')interact();
+ if(e.key==='Escape')goMenu();
+});
+window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 
-  platforms = [
-    {x:0,y:430,w:850,h:50},
-    {x:180,y:350,w:120,h:18},
-    {x:360,y:285,w:120,h:18},
-    {x:550,y:350,w:130,h:18}
-  ];
-
-  if(mode === "survival") {
-    enemies.push({x:500,y:390,w:35,h:35,vx:2});
-  }
-
-  if(mode === "tycoon") {
-    document.getElementById("status").innerText =
-      "Collect money and buy buildings with E!";
-  } else {
-    document.getElementById("status").innerText =
-      "Use arrows or A/D to move. Space to jump.";
-  }
-
-  updateHud();
-  requestAnimationFrame(loop);
-}
-
-function goMenu() {
-  playing = false;
-  document.getElementById("game").classList.add("hidden");
-  document.getElementById("menu").classList.remove("hidden");
-}
-
-function updateHud() {
-  document.getElementById("mode").innerText = names[mode];
-  document.getElementById("hp").innerText = "❤️ " + hp;
-  document.getElementById("coins").innerText = "🪙 " + coins;
-  document.getElementById("level").innerText = "⭐ Level " + level;
-}
-
-function press(key) { touch[key] = true; }
-function release(key) { touch[key] = false; }
-
-function jump() {
-  if(player.y + player.h >= 425 || player.grounded) {
-    player.vy = -12;
-    player.grounded = false;
-  }
-}
-
-function interact() {
-  if(!playing) return;
-
-  if(mode === "tycoon") {
-    if(coins >= 10) {
-      coins -= 10;
-      buildings++;
-      document.getElementById("status").innerText =
-        "🏠 You built a new building!";
-    } else {
-      document.getElementById("status").innerText =
-        "You need 10 coins to build!";
-    }
-  }
-
-  if(mode === "simulator" && coins >= 10) {
-    coins -= 10;
-    speed++;
-    document.getElementById("status").innerText =
-      "⚡ Speed upgraded!";
-  }
-
-  if(mode === "roleplay") {
-    document.getElementById("status").innerText =
-      "👋 Hello! Welcome to Block City!";
-  }
-}
-
-document.addEventListener("keydown",e=>{
-  keys[e.key.toLowerCase()] = true;
-  if(e.code === "Space") {
-    e.preventDefault();
-    jump();
-  }
-  if(e.key.toLowerCase() === "e") interact();
+document.querySelectorAll('[data-key]').forEach(b=>{
+ const k=b.dataset.key;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();touch[k]=true});
+ ['pointerup','pointerleave','pointercancel'].forEach(ev=>
+  b.addEventListener(ev,()=>touch[k]=false)
+ );
 });
 
-document.addEventListener("keyup",e=>{
-  keys[e.key.toLowerCase()] = false;
+function update(dt){
+ frame++;
+ const left=keys.a||keys.arrowleft||touch.a;
+ const right=keys.d||keys.arrowright||touch.d;
+ const forward=keys.w||keys.arrowup;
+ const back=keys.s||keys.arrowdown;
+
+ let dx=(right?1:0)-(left?1:0);
+ let dz=(back?1:0)-(forward?1:0);
+ const len=Math.hypot(dx,dz)||1;
+ dx/=len;dz/=len;
+
+ player.position.x+=dx*speed*dt;
+ player.position.z+=dz*speed*dt;
+
+ player.position.x=THREE.MathUtils.clamp(player.position.x,-23,23);
+ player.position.z=THREE.MathUtils.clamp(player.position.z,-23,23);
+
+ if(mode==='obby'){
+  player.position.x=THREE.MathUtils.clamp(player.position.x,-8,8);
+  player.position.z=THREE.MathUtils.clamp(player.position.z,-44,10);
+ }
+
+ vy-=24*dt;
+ player.position.y+=vy*dt;
+ onGround=false;
+
+ let floor=0;
+ for(const o of objects){
+  if(o.userData.platform){
+   const top=o.position.y+.3;
+   const w=o.geometry.parameters.width/2;
+   const d=o.geometry.parameters.depth/2;
+   if(Math.abs(player.position.x-o.position.x)<w+.25 &&
+      Math.abs(player.position.z-o.position.z)<d+.25 &&
+      player.position.y<=top+.15 &&
+      player.position.y>=top-.8 && vy<=0){
+     floor=Math.max(floor,top);
+   }
+  }
+ }
+
+ if(player.position.y<=floor){
+  player.position.y=floor;
+  vy=0;
+  onGround=true;
+ }
+
+ if(player.position.y < -10){
+  health-=25;
+  player.position.set(0,0,5);
+  vy=0;
+  say('Careful! You fell!');
+  if(health<=0){
+   health=0;
+   gameOver();
+  }
+ }
+
+ if(Math.abs(dx)+Math.abs(dz)>.1){
+  player.rotation.y=Math.atan2(dx,dz);
+  const swing=Math.sin(frame*.22)*.5;
+  player.userData.legs[0].rotation.x=swing;
+  player.userData.legs[1].rotation.x=-swing;
+ }else{
+  player.userData.legs.forEach(l=>l.rotation.x=0);
+ }
+
+ for(const o of [...objects]){
+  if(o.userData.coin){
+   o.rotation.y+=dt*2;
+   o.position.y=1.2+Math.sin(frame*.07)*.15;
+   if(o.position.distanceTo(player.position)<1.4){
+    scene.remove(o);
+    objects.splice(objects.indexOf(o),1);
+    coins++;
+    if(coins%10===0){
+     level++;
+     say('⭐ LEVEL UP!');
+    }
+   }
+  }
+ }
+
+ if(mode==='survival'&&frame%180===0){
+  health-=5;
+  if(health<=0)gameOver();
+ }
+
+ if(mode==='obby'&&player.position.z < -35 && player.position.y>2.5){
+  coins+=50;
+  say('🏆 OBBY COMPLETE! +50 COINS');
+  playing=false;
+ }
+
+ if(mode==='tycoon'&&buildings>0&&frame%300===0){
+  coins+=buildings*2;
+  say('💵 Your buildings earned coins!');
+ }
+
+ if(frame%600===0&&mode==='simulator'){
+  coins+=3;
+  say('🪙 BONUS +3 COINS');
+ }
+
+ updateHUD();
+}
+
+function gameOver(){
+ playing=false;
+ say('GAME OVER! Return to the menu to try again.');
+}
+
+function animate(){
+ requestAnimationFrame(animate);
+ const dt=Math.min(clock.getDelta(),.04);
+
+ if(playing){
+  update(dt);
+  const desired=new THREE.Vector3(
+   player.position.x,
+   player.position.y+7,
+   player.position.z+11
+  );
+  camera.position.lerp(desired,.12);
+  camera.lookAt(
+   player.position.x,
+   player.position.y+2,
+   player.position.z
+  );
+ }
+
+ renderer.render(scene,camera);
+}
+
+window.addEventListener('resize',()=>{
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
 });
 
-function spawnItem() {
-  items.push({
-    x:Math.random()*760+40,
-    y:Math.random()*220+160,
-    type:mode === "survival" ? "heart":"coin"
-  });
-}
-
-function drawPlayer() {
-  // Blocky character
-  ctx.fillStyle="#ffcf9e";
-  ctx.fillRect(player.x+5,player.y,20,18);
-
-  ctx.fillStyle="#2776ee";
-  ctx.fillRect(player.x,player.y+18,30,17);
-
-  ctx.fillStyle="#222";
-  ctx.fillRect(player.x+8,player.y+7,4,4);
-  ctx.fillRect(player.x+19,player.y+7,4,4);
-
-  ctx.fillStyle="#333";
-  ctx.fillRect(player.x+3,player.y+35,10,7);
-  ctx.fillRect(player.x+18,player.y+35,10,7);
-}
-
-function drawWorld() {
-  ctx.clearRect(0,0,850,480);
-
-  // Sky
-  ctx.fillStyle="#9de6ff";
-  ctx.fillRect(0,0,850,480);
-
-  // Sun
-  ctx.fillStyle="#fff36b";
-  ctx.beginPath();
-  ctx.arc(740,75,38,0,Math.PI*2);
-  ctx.fill();
-
-  // Clouds
-  ctx.fillStyle="white";
-  [100,350,600].forEach(x=>{
-    ctx.beginPath();
-    ctx.arc(x,85,20,0,Math.PI*2);
-    ctx.arc(x+22,80,25,0,Math.PI*2);
-    ctx.arc(x+45,88,18,0,Math.PI*2);
-    ctx.fill();
-  });
-
-  // Ground
-  ctx.fillStyle="#48bd50";
-  ctx.fillRect(0,430,850,50);
-
-  ctx.fillStyle="#94602d";
-  ctx.fillRect(0,455,850,25);
-
-  if(mode === "obby" || mode === "simulator") {
-    platforms.forEach(p=>{
-      ctx.fillStyle="#e4a34c";
-      ctx.fillRect(p.x,p.y,p.w,p.h);
-      ctx.fillStyle="#64c84e";
-      ctx.fillRect(p.x,p.y,p.w,6);
-    });
-  }
-
-  if(mode === "tycoon") {
-    ctx.fillStyle="#db9a45";
-    ctx.fillRect(560,330,220,100);
-
-    for(let i=0;i<buildings;i++) {
-      let x=570+(i%4)*52;
-      let y=290-Math.floor(i/4)*60;
-      ctx.fillStyle=["#e84c4c","#467cda","#eacb45"][i%3];
-      ctx.fillRect(x,y,42,55);
-      ctx.fillStyle="#fff";
-      ctx.fillRect(x+12,y+10,10,10);
-      ctx.fillRect(x+26,y+10,10,10);
-      ctx.fillStyle="#70401d";
-      ctx.fillRect(x+15,y+35,14,20);
-    }
-  }
-
-  // Items
-  items.forEach(item=>{
-    ctx.font="25px Arial";
-    ctx.fillText(item.type==="heart"?"❤️":"🪙",item.x,item.y);
-  });
-
-  // Enemies
-  enemies.forEach(enemy=>{
-    ctx.fillStyle="#a83be8";
-    ctx.fillRect(enemy.x,enemy.y,enemy.w,enemy.h);
-    ctx.fillStyle="white";
-    ctx.fillRect(enemy.x+6,enemy.y+8,6,6);
-    ctx.fillRect(enemy.x+22,enemy.y+8,6,6);
-  });
-
-  if(mode === "roleplay") {
-    ctx.fillStyle="#e9a044";
-    ctx.fillRect(400,375,50,55);
-    ctx.fillStyle="#9d4bba";
-    ctx.fillRect(410,350,30,25);
-    ctx.fillStyle="white";
-    ctx.font="15px Arial";
-    ctx.fillText("NPC - PRESS E",370,335);
-  }
-
-  drawPlayer();
-}
-
-function update() {
-  frame++;
-
-  let left=keys["a"] || keys["arrowleft"] || touch.left;
-  let right=keys["d"] || keys["arrowright"] || touch.right;
-
-  player.vx=0;
-  if(left) player.vx=-speed;
-  if(right) player.vx=speed;
-
-  player.x+=player.vx;
-  player.x=Math.max(0,Math.min(820,player.x));
-
-  // Gravity
-  if(mode !== "roleplay") {
-    player.vy+=0.55;
-    player.y+=player.vy;
-    player.grounded=false;
-
-    platforms.forEach(p=>{
-      if(player.x+player.w>p.x &&
-         player.x<p.x+p.w &&
-         player.y+player.h>=p.y &&
-         player.y+player.h<=p.y+20 &&
-         player.vy>=0) {
-        player.y=p.y-player.h;
-        player.vy=0;
-        player.grounded=true;
-      }
-    });
-  } else {
-    if(keys["w"] || keys["arrowup"]) player.y-=speed;
-    if(keys["s"] || keys["arrowdown"]) player.y+=speed;
-    player.y=Math.max(200,Math.min(388,player.y));
-  }
-
-  // Fall protection
-  if(player.y>480) {
-    if(mode==="obby") {
-      hp-=20;
-      player.x=40;
-      player.y=350;
-      player.vy=0;
-    } else {
-      player.x=40;
-      player.y=350;
-    }
-  }
-
-  // Collect coins and hearts
-  items.forEach(item=>{
-    if(Math.abs(player.x-item.x)<30 &&
-       Math.abs(player.y-item.y)<35) {
-      if(item.type==="heart") hp=Math.min(100,hp+20);
-      else coins+=1;
-      item.collected=true;
-    }
-  });
-  items=items.filter(item=>!item.collected);
-
-  // Survival enemies
-  enemies.forEach(enemy=>{
-    enemy.x+=enemy.vx;
-    if(enemy.x>790 || enemy.x<350) enemy.vx*=-1;
-
-    if(Math.abs(player.x-enemy.x)<30 &&
-       Math.abs(player.y-enemy.y)<35) {
-      if(frame-lastDamage>50) {
-        hp-=10;
-        lastDamage=frame;
-      }
-    }
-  });
-
-  // Game rewards
-  if(mode==="simulator" && frame%150===0) {
-    coins+=5;
-  }
-
-  if(mode==="tycoon" && frame%90===0) {
-    coins+=buildings*2;
-  }
-
-  if(frame%100===0) spawnItem();
-
-  // Obby finish
-  if(mode==="obby" && player.x>800) {
-    level++;
-    player.x=30;
-    coins+=20;
-    document.getElementById("status").innerText=
-      "🏆 LEVEL COMPLETE! +20 COINS!";
-  }
-
-  if(coins>=100) {
-    level=Math.max(level,2);
-  }
-
-  if(hp<=0) {
-    hp=0;
-    playing=false;
-    document.getElementById("status").innerText=
-      "💀 GAME OVER! Choose a mode to play again.";
-  }
-
-  updateHud();
-}
-
-function loop() {
-  if(!playing) return;
-  update();
-  drawWorld();
-  requestAnimationFrame(loop);
-}
+buildWorld();
+camera.position.set(0,8,15);
+camera.lookAt(0,0,0);
+animate();
 </script>
 </body>
 </html>
