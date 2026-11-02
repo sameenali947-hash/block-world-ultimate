@@ -1,0 +1,466 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLOCK WORLD ULTIMATE</title>
+<style>
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  background:linear-gradient(#61caff,#b6edff);
+  font-family:Arial,sans-serif;
+  text-align:center;
+  color:white;
+}
+h1 {
+  font-size:32px;
+  text-shadow:3px 3px #3975a8;
+  margin:15px;
+}
+#menu { padding:10px; }
+.modes {
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  max-width:800px;
+  margin:15px auto;
+}
+button {
+  border:0;
+  border-radius:12px;
+  padding:13px 18px;
+  font-weight:bold;
+  font-size:15px;
+  background:#ffca48;
+  cursor:pointer;
+  box-shadow:0 4px #b47d18;
+}
+button:hover { transform:scale(1.04); }
+#hud {
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:20px;
+  font-size:17px;
+  font-weight:bold;
+  margin:12px;
+}
+canvas {
+  display:block;
+  width:min(95%,850px);
+  height:auto;
+  margin:auto;
+  border:5px solid white;
+  border-radius:12px;
+  background:#9de6ff;
+}
+#controls {
+  margin:15px;
+}
+#controls button {
+  min-width:65px;
+  font-size:20px;
+}
+#status { font-weight:bold; margin:12px; }
+.hidden { display:none !important; }
+</style>
+</head>
+<body>
+
+<h1>🌎 BLOCK WORLD ULTIMATE</h1>
+
+<div id="menu">
+  <h2>Choose Your Game!</h2>
+  <div class="modes">
+    <button onclick="start('obby')">🏃 OBBY</button>
+    <button onclick="start('simulator')">🪙 SIMULATOR</button>
+    <button onclick="start('survival')">❤️ SURVIVAL</button>
+    <button onclick="start('tycoon')">🏗️ TYCOON</button>
+    <button onclick="start('roleplay')">🏡 ROLEPLAY</button>
+  </div>
+  <p>Welcome to Block World! Pick your adventure.</p>
+</div>
+
+<div id="game" class="hidden">
+  <div id="hud">
+    <span id="mode">Game</span>
+    <span id="hp">❤️ 100</span>
+    <span id="coins">🪙 0</span>
+    <span id="level">⭐ Level 1</span>
+  </div>
+
+  <canvas id="canvas" width="850" height="480"></canvas>
+
+  <div id="status">Have fun!</div>
+
+  <div id="controls">
+    <button onpointerdown="press('left')" onpointerup="release('left')" onpointerleave="release('left')">⬅️</button>
+    <button onpointerdown="press('right')" onpointerup="release('right')" onpointerleave="release('right')">➡️</button>
+    <button onclick="jump()">⬆️ JUMP</button>
+    <button onclick="interact()">E / USE</button>
+  </div>
+
+  <button onclick="goMenu()">🏠 MAIN MENU</button>
+</div>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+let mode = "";
+let coins = 0;
+let hp = 100;
+let level = 1;
+let speed = 4;
+let playing = false;
+let frame = 0;
+let keys = {};
+let touch = {};
+let player = {x:70,y:350,w:30,h:42,vx:0,vy:0};
+let items = [];
+let enemies = [];
+let platforms = [];
+let buildings = 0;
+let lastDamage = 0;
+
+const names = {
+  obby:"🏃 OBBY",
+  simulator:"🪙 SIMULATOR",
+  survival:"❤️ SURVIVAL",
+  tycoon:"🏗️ TYCOON",
+  roleplay:"🏡 ROLEPLAY"
+};
+
+function start(selected) {
+  mode = selected;
+  coins = 0;
+  hp = 100;
+  level = 1;
+  speed = 4;
+  buildings = 0;
+  frame = 0;
+  player = {x:70,y:350,w:30,h:42,vx:0,vy:0};
+  items = [];
+  enemies = [];
+  touch = {};
+  playing = true;
+
+  document.getElementById("menu").classList.add("hidden");
+  document.getElementById("game").classList.remove("hidden");
+
+  platforms = [
+    {x:0,y:430,w:850,h:50},
+    {x:180,y:350,w:120,h:18},
+    {x:360,y:285,w:120,h:18},
+    {x:550,y:350,w:130,h:18}
+  ];
+
+  if(mode === "survival") {
+    enemies.push({x:500,y:390,w:35,h:35,vx:2});
+  }
+
+  if(mode === "tycoon") {
+    document.getElementById("status").innerText =
+      "Collect money and buy buildings with E!";
+  } else {
+    document.getElementById("status").innerText =
+      "Use arrows or A/D to move. Space to jump.";
+  }
+
+  updateHud();
+  requestAnimationFrame(loop);
+}
+
+function goMenu() {
+  playing = false;
+  document.getElementById("game").classList.add("hidden");
+  document.getElementById("menu").classList.remove("hidden");
+}
+
+function updateHud() {
+  document.getElementById("mode").innerText = names[mode];
+  document.getElementById("hp").innerText = "❤️ " + hp;
+  document.getElementById("coins").innerText = "🪙 " + coins;
+  document.getElementById("level").innerText = "⭐ Level " + level;
+}
+
+function press(key) { touch[key] = true; }
+function release(key) { touch[key] = false; }
+
+function jump() {
+  if(player.y + player.h >= 425 || player.grounded) {
+    player.vy = -12;
+    player.grounded = false;
+  }
+}
+
+function interact() {
+  if(!playing) return;
+
+  if(mode === "tycoon") {
+    if(coins >= 10) {
+      coins -= 10;
+      buildings++;
+      document.getElementById("status").innerText =
+        "🏠 You built a new building!";
+    } else {
+      document.getElementById("status").innerText =
+        "You need 10 coins to build!";
+    }
+  }
+
+  if(mode === "simulator" && coins >= 10) {
+    coins -= 10;
+    speed++;
+    document.getElementById("status").innerText =
+      "⚡ Speed upgraded!";
+  }
+
+  if(mode === "roleplay") {
+    document.getElementById("status").innerText =
+      "👋 Hello! Welcome to Block City!";
+  }
+}
+
+document.addEventListener("keydown",e=>{
+  keys[e.key.toLowerCase()] = true;
+  if(e.code === "Space") {
+    e.preventDefault();
+    jump();
+  }
+  if(e.key.toLowerCase() === "e") interact();
+});
+
+document.addEventListener("keyup",e=>{
+  keys[e.key.toLowerCase()] = false;
+});
+
+function spawnItem() {
+  items.push({
+    x:Math.random()*760+40,
+    y:Math.random()*220+160,
+    type:mode === "survival" ? "heart":"coin"
+  });
+}
+
+function drawPlayer() {
+  // Blocky character
+  ctx.fillStyle="#ffcf9e";
+  ctx.fillRect(player.x+5,player.y,20,18);
+
+  ctx.fillStyle="#2776ee";
+  ctx.fillRect(player.x,player.y+18,30,17);
+
+  ctx.fillStyle="#222";
+  ctx.fillRect(player.x+8,player.y+7,4,4);
+  ctx.fillRect(player.x+19,player.y+7,4,4);
+
+  ctx.fillStyle="#333";
+  ctx.fillRect(player.x+3,player.y+35,10,7);
+  ctx.fillRect(player.x+18,player.y+35,10,7);
+}
+
+function drawWorld() {
+  ctx.clearRect(0,0,850,480);
+
+  // Sky
+  ctx.fillStyle="#9de6ff";
+  ctx.fillRect(0,0,850,480);
+
+  // Sun
+  ctx.fillStyle="#fff36b";
+  ctx.beginPath();
+  ctx.arc(740,75,38,0,Math.PI*2);
+  ctx.fill();
+
+  // Clouds
+  ctx.fillStyle="white";
+  [100,350,600].forEach(x=>{
+    ctx.beginPath();
+    ctx.arc(x,85,20,0,Math.PI*2);
+    ctx.arc(x+22,80,25,0,Math.PI*2);
+    ctx.arc(x+45,88,18,0,Math.PI*2);
+    ctx.fill();
+  });
+
+  // Ground
+  ctx.fillStyle="#48bd50";
+  ctx.fillRect(0,430,850,50);
+
+  ctx.fillStyle="#94602d";
+  ctx.fillRect(0,455,850,25);
+
+  if(mode === "obby" || mode === "simulator") {
+    platforms.forEach(p=>{
+      ctx.fillStyle="#e4a34c";
+      ctx.fillRect(p.x,p.y,p.w,p.h);
+      ctx.fillStyle="#64c84e";
+      ctx.fillRect(p.x,p.y,p.w,6);
+    });
+  }
+
+  if(mode === "tycoon") {
+    ctx.fillStyle="#db9a45";
+    ctx.fillRect(560,330,220,100);
+
+    for(let i=0;i<buildings;i++) {
+      let x=570+(i%4)*52;
+      let y=290-Math.floor(i/4)*60;
+      ctx.fillStyle=["#e84c4c","#467cda","#eacb45"][i%3];
+      ctx.fillRect(x,y,42,55);
+      ctx.fillStyle="#fff";
+      ctx.fillRect(x+12,y+10,10,10);
+      ctx.fillRect(x+26,y+10,10,10);
+      ctx.fillStyle="#70401d";
+      ctx.fillRect(x+15,y+35,14,20);
+    }
+  }
+
+  // Items
+  items.forEach(item=>{
+    ctx.font="25px Arial";
+    ctx.fillText(item.type==="heart"?"❤️":"🪙",item.x,item.y);
+  });
+
+  // Enemies
+  enemies.forEach(enemy=>{
+    ctx.fillStyle="#a83be8";
+    ctx.fillRect(enemy.x,enemy.y,enemy.w,enemy.h);
+    ctx.fillStyle="white";
+    ctx.fillRect(enemy.x+6,enemy.y+8,6,6);
+    ctx.fillRect(enemy.x+22,enemy.y+8,6,6);
+  });
+
+  if(mode === "roleplay") {
+    ctx.fillStyle="#e9a044";
+    ctx.fillRect(400,375,50,55);
+    ctx.fillStyle="#9d4bba";
+    ctx.fillRect(410,350,30,25);
+    ctx.fillStyle="white";
+    ctx.font="15px Arial";
+    ctx.fillText("NPC - PRESS E",370,335);
+  }
+
+  drawPlayer();
+}
+
+function update() {
+  frame++;
+
+  let left=keys["a"] || keys["arrowleft"] || touch.left;
+  let right=keys["d"] || keys["arrowright"] || touch.right;
+
+  player.vx=0;
+  if(left) player.vx=-speed;
+  if(right) player.vx=speed;
+
+  player.x+=player.vx;
+  player.x=Math.max(0,Math.min(820,player.x));
+
+  // Gravity
+  if(mode !== "roleplay") {
+    player.vy+=0.55;
+    player.y+=player.vy;
+    player.grounded=false;
+
+    platforms.forEach(p=>{
+      if(player.x+player.w>p.x &&
+         player.x<p.x+p.w &&
+         player.y+player.h>=p.y &&
+         player.y+player.h<=p.y+20 &&
+         player.vy>=0) {
+        player.y=p.y-player.h;
+        player.vy=0;
+        player.grounded=true;
+      }
+    });
+  } else {
+    if(keys["w"] || keys["arrowup"]) player.y-=speed;
+    if(keys["s"] || keys["arrowdown"]) player.y+=speed;
+    player.y=Math.max(200,Math.min(388,player.y));
+  }
+
+  // Fall protection
+  if(player.y>480) {
+    if(mode==="obby") {
+      hp-=20;
+      player.x=40;
+      player.y=350;
+      player.vy=0;
+    } else {
+      player.x=40;
+      player.y=350;
+    }
+  }
+
+  // Collect coins and hearts
+  items.forEach(item=>{
+    if(Math.abs(player.x-item.x)<30 &&
+       Math.abs(player.y-item.y)<35) {
+      if(item.type==="heart") hp=Math.min(100,hp+20);
+      else coins+=1;
+      item.collected=true;
+    }
+  });
+  items=items.filter(item=>!item.collected);
+
+  // Survival enemies
+  enemies.forEach(enemy=>{
+    enemy.x+=enemy.vx;
+    if(enemy.x>790 || enemy.x<350) enemy.vx*=-1;
+
+    if(Math.abs(player.x-enemy.x)<30 &&
+       Math.abs(player.y-enemy.y)<35) {
+      if(frame-lastDamage>50) {
+        hp-=10;
+        lastDamage=frame;
+      }
+    }
+  });
+
+  // Game rewards
+  if(mode==="simulator" && frame%150===0) {
+    coins+=5;
+  }
+
+  if(mode==="tycoon" && frame%90===0) {
+    coins+=buildings*2;
+  }
+
+  if(frame%100===0) spawnItem();
+
+  // Obby finish
+  if(mode==="obby" && player.x>800) {
+    level++;
+    player.x=30;
+    coins+=20;
+    document.getElementById("status").innerText=
+      "🏆 LEVEL COMPLETE! +20 COINS!";
+  }
+
+  if(coins>=100) {
+    level=Math.max(level,2);
+  }
+
+  if(hp<=0) {
+    hp=0;
+    playing=false;
+    document.getElementById("status").innerText=
+      "💀 GAME OVER! Choose a mode to play again.";
+  }
+
+  updateHud();
+}
+
+function loop() {
+  if(!playing) return;
+  update();
+  drawWorld();
+  requestAnimationFrame(loop);
+}
+</script>
+</body>
+</html>
