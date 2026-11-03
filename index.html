@@ -422,7 +422,7 @@ arm.position.z=0;
 
  for(const side of [-1,1]){
   const leg=new THREE.Group();
-leg.position = new THREE.Vector3(side*.22,.72,0);
+leg.position.set(side*.22,.72,0);
 
   const legMesh=new THREE.Mesh(
    new THREE.CapsuleGeometry(.17,.45,5,12),
