@@ -60,12 +60,22 @@ button:hover{filter:brightness(1.2);transform:translateY(-2px)}
   <p>Explore • Build • Survive • Become a legend!</p>
   <div class="lobby-welcome">
   <h2>🏙️ WELCOME TO BLOCK CITY!</h2>
-   <div class="lobby-features">
-  <p>Meet friends, customise your avatar and explore amazing worlds!</p>
-    <div>🛍️ <b>AVATAR SHOP</b><br><small>Discover new outfits</small></div>
-    <div>🎁 <b>DAILY REWARDS</b><br><small>Claim your gifts</small></div>
-    <div>👥 <b>MEET NPCs</b><br><small>Make new friends</small></div>
-  </div>
+<div class="lobby-features">
+  <button onclick="openAvatarShop()">
+    🛍️ <b>AVATAR SHOP</b><br>
+    <small>Discover new outfits</small>
+  </button>
+
+  <button onclick="dailyReward()">
+    🎁 <b>DAILY REWARDS</b><br>
+    <small>Claim your gifts</small>
+  </button>
+
+  <button onclick="meetNPCs()">
+    👥 <b>MEET NPCs</b><br>
+    <small>Make new friends</small>
+  </button>
+</div>
   <h2>🌀 CHOOSE YOUR PORTAL</h2>
 </div>
   <div class="modes">
@@ -649,7 +659,29 @@ function update(dt){
 
  updateHUD();
 }
+function openAvatarShop(){
+  const shop=document.getElementById('avatarEditor');
+  shop.scrollIntoView({behavior:'smooth',block:'center'});
+  say('🛍️ Welcome to the Avatar Shop!');
+}
 
+function dailyReward(){
+  const today=new Date().toDateString();
+
+  if(localStorage.getItem('blockWorldReward')===today){
+    say('🎁 You already claimed today’s reward!');
+    return;
+  }
+
+  coins+=25;
+  localStorage.setItem('blockWorldReward',today);
+  updateHUD();
+  say('🎉 DAILY REWARD! +25 COINS!');
+}
+
+function meetNPCs(){
+  say('👋 Welcome to Block City! Go explore and meet everyone!');
+}
 function gameOver(){
  playing=false;
  say('GAME OVER! Return to the menu to try again.');
