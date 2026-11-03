@@ -220,6 +220,7 @@ function shoot(){
 function platform(x,y,z,w,d,mat=grass){
  const p=cube(x,y,z,w,.6,d,mat);
  p.userData.platform=true;
+ objects.push(p);
  return p;
 }
 
