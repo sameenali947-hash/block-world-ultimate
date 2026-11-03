@@ -225,25 +225,27 @@ function platform(x,y,z,w,d,mat=grass){
 }
 
 function makeCoin(x,z){
-  const m=new THREE.Mesh(
-  new THREE.CylinderGeometry(.4,.4,.13,16),
-  gold
- );
+  const g = new THREE.Group();
 
- m.rotation.x=Math.PI/2;
- g.add(m);
+  const m = new THREE.Mesh(
+    new THREE.CylinderGeometry(.4,.4,.13,16),
+    gold
+  );
 
- const glow=new THREE.PointLight(0xffcf33,1,3);
- g.add(glow);
+  m.rotation.x = Math.PI/2;
+  g.add(m);
 
- g.position.set(x,1.2,z);
- g.userData={
-  coin:true,
-  homeX:x,
-  homeZ:z
- };
+  const glow = new THREE.PointLight(0xffcf33,1,3);
+  g.add(glow);
 
- addObject(g);
+  g.position.set(x,1.2,z);
+  g.userData = {
+    coin: true,
+    homeX: x,
+    homeZ: z
+  };
+
+  addObject(g);
 }
 
 function tree(x,z){
