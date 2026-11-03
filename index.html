@@ -9,13 +9,13 @@
 body{margin:0;overflow:hidden;font-family:Arial,sans-serif;background:#78d5ff;color:white}
 #game{position:fixed;inset:0}
 #menu{position:fixed;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;background:linear-gradient(#164477aa,#101c42dd)}
-.panel{background:#182b50ed;padding:30px;border:2px solid #ffffff55;border-radius:25px;width:min(850px,94vw);text-align:center;box-shadow:0 20px 60px #10204499}
+.panel{background:linear-gradient(145deg,#102f63ee,#071d42f2);padding:24px;border:2px solid #56c9ff;border-radius:28px;width:min(1120px,96vw);max-height:94vh;overflow:auto;text-align:center;box-shadow:0 20px 60px #10204499} #avatarEditor{margin:14px auto;padding:12px;background:#071d42aa;border:1px solid #ffffff44;border-radius:14px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap} #avatarEditor select{padding:9px;border-radius:9px;font-weight:bold}
 h1{font-size:clamp(32px,6vw,58px);margin:5px;color:#ffdf55;text-shadow:0 5px #a65c25}
 p{color:#d5e7ff}
-.modes{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:25px}
+.modes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:22px}
 button{border:0;border-radius:15px;padding:15px 8px;color:white;font-weight:bold;font-size:15px;cursor:pointer;background:linear-gradient(#579bff,#3154a7);box-shadow:0 5px #203c79}
 button:hover{filter:brightness(1.2);transform:translateY(-2px)}
-.mode{min-height:115px;font-size:17px}
+.mode{min-height:105px;font-size:16px;border-radius:18px;background:linear-gradient(160deg,#24b9ff,#1760c8);box-shadow:0 6px #103b83}
 .mode span{display:block;font-size:35px;margin-bottom:8px}
 #hud{position:fixed;top:15px;left:15px;right:15px;display:none;gap:10px;align-items:center;flex-wrap:wrap;z-index:3}
 .stat{background:#172b50dd;border:1px solid #ffffff55;padding:12px 15px;border-radius:12px;font-weight:bold}
@@ -25,7 +25,7 @@ button:hover{filter:brightness(1.2);transform:translateY(-2px)}
 #controls{position:fixed;bottom:20px;left:15px;right:15px;display:none;justify-content:space-between;z-index:4}
 .control{font-size:25px;padding:18px;background:#172b50cc;touch-action:none}
 #help{position:fixed;bottom:15px;right:15px;background:#172b50cc;padding:10px;border-radius:10px;z-index:3}
-@media(max-width:650px){.modes{grid-template-columns:repeat(2,1fr)}.mode:last-child{grid-column:span 2}#help{display:none}.control{padding:16px}#controls{display:flex}}
+@media(max-width:760px){.modes{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.mode{min-height:85px}.mode span{font-size:27px}.panel{padding:16px}#help{display:none}.control{padding:16px}#controls{display:flex}}
 </style>
 </head>
 <body>
@@ -42,8 +42,26 @@ button:hover{filter:brightness(1.2);transform:translateY(-2px)}
    <button class="mode" onclick="start('survival')"><span>🛡️</span>SURVIVAL</button>
    <button class="mode" onclick="start('tycoon')"><span>🏗️</span>TYCOON</button>
    <button class="mode" onclick="start('roleplay')"><span>🏡</span>ROLEPLAY</button>
+   <button class="mode" onclick="start('pvp')"><span>⚔️</span>PVP</button>
+   <button class="mode" onclick="start('parkour')"><span>🧗</span>PARKOUR</button>
+   <button class="mode" onclick="start('minigames')"><span>🏆</span>MINIGAMES</button>
+   <button class="mode" onclick="start('teams')"><span>🚩</span>TEAMS</button>
+   <button class="mode" onclick="start('worlds')"><span>🌀</span>WORLDS</button>
+   <button class="mode" onclick="start('shooter')"><span>🔫</span>BLASTER ARENA</button>
+   <button class="mode" onclick="start('realistic')"><span>🌆</span>REALISTIC CITY</button>
+   <button class="mode" onclick="start('cars')"><span>🏎️</span>CAR RACING</button>
   </div>
-  <p>WASD to move • SPACE to jump • E to interact</p>
+  <div id="avatarEditor">
+   <label>🎨 Shirt colour</label>
+   <select id="avatarColor" onchange="changeAvatar(this.value)">
+    <option value="#3479ee">Blue</option><option value="#e84b5b">Red</option><option value="#27a86a">Green</option><option value="#9859e9">Purple</option><option value="#ffb52e">Gold</option><option value="#222b3b">Black</option>
+   </select>
+   <label>👕 Avatar style</label>
+   <select onchange="changeAvatarStyle(this.value)">
+    <option value="classic">Classic</option><option value="sport">Sport</option><option value="robot">Robot</option>
+   </select>
+  </div>
+  <p>WASD to move • SPACE to jump • E to interact • F to fire in Blaster Arena</p>
  </div>
 </div>
 
@@ -52,6 +70,7 @@ button:hover{filter:brightness(1.2);transform:translateY(-2px)}
  <div class="stat" id="health">❤️ 100</div>
  <div class="stat" id="coins">🪙 0</div>
  <div class="stat" id="level">⭐ Level 1</div>
+ <button id="shootButton" onclick="shoot()" style="display:none;background:#d94b35">🔫 SHOOT (F)</button>
  <button id="menuButton" onclick="goMenu()">☰ MENU</button>
 </div>
 <div id="objective"></div>
@@ -109,6 +128,7 @@ const white=material(0xffffff);
 let player,mode='obby',playing=false;
 let keys={},touch={},objects=[],coins=0,health=100,level=1;
 let speed=5,vy=0,onGround=false,buildings=0,frame=0;
+let avatarColor=0x3479ee, avatarStyle='classic', car=null, targets=[], shots=[];
 let clock=new THREE.Clock();
 
 function cube(x,y,z,w,h,d,mat,group=scene){
@@ -128,12 +148,13 @@ function clearWorld(){
 function addObject(o){
  scene.add(o);
  objects.push(o);
- return o;
+  return o;
 }
 
 function makePlayer(){
  const g=new THREE.Group();
- cube(0,1.1,0,.8,.9,.5,blue,g);
+ const shirt=cube(0,1.1,0,.8,.9,.5,material(avatarColor),g);
+ g.userData.shirt=shirt;
  cube(0,1.85,0,.62,.62,.62,skin,g);
  cube(-.14,1.9,.32,.07,.08,.03,dark,g);
  cube(.14,1.9,.32,.07,.08,.03,dark,g);
@@ -143,6 +164,57 @@ function makePlayer(){
  g.userData.legs=legs;
  addObject(g);
  return g;
+}
+
+function changeAvatar(value){
+ avatarColor=parseInt(value.replace('#',''),16);
+ if(player && player.userData.shirt) player.userData.shirt.material=material(avatarColor);
+}
+
+function changeAvatarStyle(value){
+ avatarStyle=value;
+ if(player){
+  player.children[1].material=value==='robot'?material(0xb8d5e8):skin;
+  if(player.userData.accessory) player.remove(player.userData.accessory);
+  if(value==='sport'){
+   const band=cube(0,2.2,0,.72,.12,.72,red,player);
+   player.userData.accessory=band;
+  }else if(value==='robot'){
+   const antenna=cube(0,2.35,0,.12,.35,.12,gold,player);
+   player.userData.accessory=antenna;
+  }
+  say(value==='robot'?'🤖 Robot avatar selected!':value==='sport'?'🏃 Sport avatar selected!':'🙂 Classic avatar selected!');
+ }
+}
+
+function makeCar(){
+ const g=new THREE.Group();
+ cube(0,.65,0,2.5,.7,4,red,g);
+ cube(0,1.25,-.25,1.7,.8,1.8,blue,g);
+ const wheels=[];
+ for(const x of [-1.25,1.25]) for(const z of [-1.25,1.25]){
+  const w=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.25,16),dark);
+  w.rotation.z=Math.PI/2;
+  w.position.set(x,.35,z);
+  g.add(w);
+  wheels.push(w);
+ }
+ g.userData.wheels=wheels;
+ g.position.set(0,0,1);
+ addObject(g);
+ return g;
+}
+
+function shoot(){
+ if(!playing || mode!=='shooter') return;
+ const beam=cube(player.position.x,player.position.y+1.4,player.position.z-2,.12,.12,2,gold);
+ shots.push({mesh:beam,life:.16});
+ const target=targets.find(t=>t.visible && t.position.distanceTo(player.position)<13);
+ if(target){
+  target.visible=false;
+  coins++;
+  say('🎯 Target hit! +1 coin');
+ }
 }
 
 function platform(x,y,z,w,d,mat=grass){
@@ -199,6 +271,9 @@ function start(selected){
  buildings=0;
  frame=0;
  vy=0;
+ car=null;
+ targets=[];
+ shots=[];
 
  clearWorld();
  buildWorld();
@@ -246,6 +321,60 @@ function start(selected){
   for(let i=0;i<12;i++){
    makeCoin((Math.random()-.5)*30,(Math.random()-.5)*30);
   }
+ }else if(mode==='pvp'){
+  for(let i=0;i<6;i++){
+   npc((i%3-1)*7,-8-Math.floor(i/3)*9,i%2?red:purple);
+  }
+  for(let i=0;i<10;i++) makeCoin((Math.random()-.5)*24,(Math.random()-.5)*24);
+ }else if(mode==='parkour'){
+  for(let i=0;i<14;i++){
+   const x=Math.sin(i*1.4)*5;
+   const z=-3-i*3.2;
+   platform(x,1+(i%4)*.35,z,3,2.8,[blue,purple,red,gold][i%4]);
+   makeCoin(x,z);
+  }
+  platform(0,3,-49,7,7,gold);
+ }else if(mode==='minigames'){
+  for(let i=0;i<18;i++){
+   const x=(i%6-2.5)*5;
+   const z=-7-Math.floor(i/6)*7;
+   platform(x,.2,z,3.5,3,[blue,red,purple,gold][i%4]);
+   makeCoin(x,z);
+  }
+ }else if(mode==='teams'){
+  platform(-8,.1,-8,12,10,blue);
+  platform(8,.1,-8,12,10,red);
+  npc(-8,-8,blue);
+  npc(8,-8,red);
+  for(let i=0;i<14;i++) makeCoin((Math.random()-.5)*28,(Math.random()-.5)*25);
+ }else if(mode==='worlds'){
+  const worldMats=[green,blue,purple,gold,red];
+  for(let i=0;i<5;i++){
+   const x=(i-2)*9;
+   platform(x,.2,-12,7,7,worldMats[i]);
+   tree(x,-12);
+   makeCoin(x,-12);
+  }
+  say('Explore the five coloured world portals!');
+ }else if(mode==='shooter'){
+  for(let i=0;i<8;i++){
+   const t=cube((i%4-1.5)*5,1.5,-12-Math.floor(i/4)*8,1.2,2,1.2,[red,purple,gold][i%3]);
+   targets.push(t);
+  }
+ }else if(mode==='realistic'){
+  platform(0,-.1,0,48,48,dark);
+  for(let i=0;i<6;i++){
+   const x=(i%3-1)*13,z=-8-Math.floor(i/3)*17;
+   cube(x,3,z,8,6,8,[blue,red,purple,green][i%4]);
+   cube(x,6.3,z,8,.5,8,white);
+   cube(x+5,1.5,z+5,.35,3,.35,gold);
+  }
+  for(let i=0;i<10;i++) makeCoin((Math.random()-.5)*30,(Math.random()-.5)*30);
+ }else if(mode==='cars'){
+  car=makeCar();
+  platform(0,-.05,-12,9,40,dark);
+  for(let i=0;i<12;i++) cube(-4.4,.02,-28+i*3,.15,.04,1.4,gold);
+  say('🏎️ Drive with WASD!');
  }
 
  document.getElementById('menu').style.display='none';
@@ -257,14 +386,22 @@ function start(selected){
   simulator:'Collect coins and upgrade your speed!',
   survival:'Avoid danger and collect coins!',
   tycoon:'Collect 15 coins and press E to build!',
-  roleplay:'Explore the city and meet people!'
+  roleplay:'Explore the city and meet people!',
+  pvp:'Challenge the training bots and collect coins!',
+  parkour:'Jump across the floating platforms!',
+  minigames:'Explore the challenge platforms and collect rewards!',
+  teams:'Choose a side and explore the team arenas!',
+  worlds:'Visit the five coloured world islands!',
+  shooter:'Press F to fire harmless energy blasters at the targets!',
+  realistic:'Explore the city streets and collect coins!',
+  cars:'Drive your car with WASD along the road!'
  };
  document.getElementById('objective').textContent=goals[selected];
+ document.getElementById('shootButton').style.display=selected==='shooter'?'block':'none';
  playing=true;
  updateHUD();
 }
-
-function updateHUD(){
+ function updateHUD(){
  document.getElementById('health').textContent='❤️ '+health;
  document.getElementById('coins').textContent='🪙 '+coins;
  document.getElementById('level').textContent='⭐ Level '+level;
@@ -314,6 +451,7 @@ window.goMenu=()=>{
  document.getElementById('menu').style.display='flex';
  document.getElementById('hud').style.display='none';
  document.getElementById('objective').style.display='none';
+ document.getElementById('shootButton').style.display='none';
 };
 
 window.restart=()=>start(mode);
@@ -322,9 +460,14 @@ window.addEventListener('keydown',e=>{
  keys[e.key.toLowerCase()]=true;
  if(e.code==='Space'){e.preventDefault();jump()}
  if(e.key.toLowerCase()==='e')interact();
+ if(e.key.toLowerCase()==='f')shoot();
  if(e.key==='Escape')goMenu();
 });
 window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
+window.addEventListener('blur',()=>{
+ for(const k in keys) keys[k]=false;
+ for(const k in touch) touch[k]=false;
+});
 
 document.querySelectorAll('[data-key]').forEach(b=>{
  const k=b.dataset.key;
@@ -346,60 +489,58 @@ function update(dt){
  const len=Math.hypot(dx,dz)||1;
  dx/=len;dz/=len;
 
- player.position.x+=dx*speed*dt;
- player.position.z+=dz*speed*dt;
+ if(mode==='cars'&&car){
+  car.position.x+=dx*speed*dt;
+  car.position.z+=dz*speed*dt;
+  car.position.x=THREE.MathUtils.clamp(car.position.x,-3,3);
+  car.position.z=THREE.MathUtils.clamp(car.position.z,-35,10);
+  car.rotation.y=Math.atan2(dx,-dz);
+  car.userData.wheels.forEach(w=>w.rotation.x+=dt*8);
+  player.position.copy(car.position);
+  player.position.y=-10;
+ }else{
+  player.position.x+=dx*speed*dt;
+  player.position.z+=dz*speed*dt;
+  player.position.x=THREE.MathUtils.clamp(player.position.x,-23,23);
+  player.position.z=THREE.MathUtils.clamp(player.position.z,-55,30);
 
- player.position.x=THREE.MathUtils.clamp(player.position.x,-23,23);
- player.position.z=THREE.MathUtils.clamp(player.position.z,-23,23);
+  if(mode==='obby'){
+   player.position.x=THREE.MathUtils.clamp(player.position.x,-8,8);
+   player.position.z=THREE.MathUtils.clamp(player.position.z,-44,10);
+  }
 
- if(mode==='obby'){
-  player.position.x=THREE.MathUtils.clamp(player.position.x,-8,8);
-  player.position.z=THREE.MathUtils.clamp(player.position.z,-44,10);
- }
+  const previousFeet=player.position.y;
+  vy-=24*dt;
+  player.position.y+=vy*dt;
+  onGround=false;
 
- vy-=24*dt;
- player.position.y+=vy*dt;
- onGround=false;
-
- let floor=0;
- for(const o of objects){
-  if(o.userData.platform){
-   const top=o.position.y+.3;
-   const w=o.geometry.parameters.width/2;
-   const d=o.geometry.parameters.depth/2;
-   if(Math.abs(player.position.x-o.position.x)<w+.25 &&
-      Math.abs(player.position.z-o.position.z)<d+.25 &&
-      player.position.y<=top+.15 &&
-      player.position.y>=top-.8 && vy<=0){
-     floor=Math.max(floor,top);
+  let landingHeight=null;
+  if(vy<=0){
+   for(const o of objects){
+    if(!o.userData.platform)continue;
+    const top=o.position.y+.3;
+    const w=o.geometry.parameters.width/2;
+    const d=o.geometry.parameters.depth/2;
+    const overlapsX=Math.abs(player.position.x-o.position.x)<w+.25;
+    const overlapsZ=Math.abs(player.position.z-o.position.z)<d+.25;
+    const crossed=previousFeet>=top-.02&&player.position.y<=top;
+    if(overlapsX&&overlapsZ&&crossed){
+     if(landingHeight===null||top>landingHeight)landingHeight=top;
+    }
    }
   }
- }
-
- if(player.position.y<=floor){
-  player.position.y=floor;
-  vy=0;
-  onGround=true;
- }
-
- if(player.position.y < -10){
-  health-=25;
-  player.position.set(0,0,5);
-  vy=0;
-  say('Careful! You fell!');
-  if(health<=0){
-   health=0;
-   gameOver();
+  if(landingHeight!==null){
+   player.position.y=landingHeight;
+   vy=0;
+   onGround=true;
   }
- }
-
- if(Math.abs(dx)+Math.abs(dz)>.1){
-  player.rotation.y=Math.atan2(dx,dz);
-  const swing=Math.sin(frame*.22)*.5;
-  player.userData.legs[0].rotation.x=swing;
-  player.userData.legs[1].rotation.x=-swing;
- }else{
-  player.userData.legs.forEach(l=>l.rotation.x=0);
+  if(player.position.y< -12){
+   player.position.set(0,0,5);
+   vy=0;
+   health-=10;
+   say('💥 You fell! -10 health');
+   if(health<=0)gameOver();
+  }
  }
 
  for(const o of [...objects]){
@@ -423,7 +564,7 @@ function update(dt){
   if(health<=0)gameOver();
  }
 
- if(mode==='obby'&&player.position.z < -35 && player.position.y>2.5){
+ if(mode==='obby'&&player.position.z< -35&&player.position.y>2.5){
   coins+=50;
   say('🏆 OBBY COMPLETE! +50 COINS');
   playing=false;
@@ -446,24 +587,31 @@ function gameOver(){
  playing=false;
  say('GAME OVER! Return to the menu to try again.');
 }
-
-function animate(){
+ function animate(){
  requestAnimationFrame(animate);
  const dt=Math.min(clock.getDelta(),.04);
 
- if(playing){
+ if(playing&&player){
   update(dt);
-  const desired=new THREE.Vector3(
+  const target=new THREE.Vector3(
    player.position.x,
-   player.position.y+7,
-   player.position.z+11
+   player.position.y+5,
+   player.position.z+9
   );
-  camera.position.lerp(desired,.12);
+  camera.position.lerp(target,.09);
   camera.lookAt(
    player.position.x,
-   player.position.y+2,
-   player.position.z
+   player.position.y+1,
+   player.position.z-3
   );
+ }
+
+ for(const s of [...shots]){
+  s.life-=dt;
+  if(s.life<=0){
+   scene.remove(s.mesh);
+   shots.splice(shots.indexOf(s),1);
+  }
  }
 
  renderer.render(scene,camera);
@@ -475,9 +623,6 @@ window.addEventListener('resize',()=>{
  renderer.setSize(innerWidth,innerHeight);
 });
 
-buildWorld();
-camera.position.set(0,8,15);
-camera.lookAt(0,0,0);
 animate();
 </script>
 </body>
