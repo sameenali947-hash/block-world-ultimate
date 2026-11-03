@@ -762,16 +762,86 @@ document.getElementById('mailboxCash').textContent =
  player=makePlayer();
  player.position.set(0,0,5);
 
- if(mode==='obby'){
-  for(let i=0;i<9;i++){
-   const x=(i%2===0)?-2:2;
-   const z=-2-i*4;
-   platform(x,1+i*.3,z,3.5,3);
-   makeCoin(x,z);
-  }
-  platform(0,4,-40,8,8,gold);
-  cube(0,6,-40,2,4,.4,purple);
- }else if(mode==='simulator'){
+if(mode==='obby'){
+
+ const colours=[
+  0xff315c,0xff922e,0xffe34d,0x38e878,
+  0x28d9ff,0x526bff,0xb34cff,0xff55d4
+ ];
+
+ const course=[
+  [0,1,-3,4,4],
+  [3,1.3,-7,2.5,2.5],
+  [-2,1.6,-11,2.2,2.2],
+  [2,2,-15,2,2],
+  [5,2.3,-19,2,2],
+  [0,2.6,-23,2.5,2],
+  [-4,2.9,-27,2,2],
+  [1,3.2,-31,2,2],
+  [5,3.5,-35,1.8,1.8],
+  [0,3.8,-39,2,2],
+  [-5,4.1,-43,1.8,1.8],
+  [-1,4.4,-47,2,2],
+  [4,4.7,-51,1.8,1.8],
+  [0,5,-55,2,2],
+  [-4,5.3,-59,1.8,1.8],
+  [2,5.6,-63,2,2],
+  [5,5.9,-67,1.8,1.8],
+  [0,6.2,-71,2.5,2.5],
+  [-3,6.5,-75,2,2],
+  [0,6.8,-79,12,10]
+ ];
+
+ course.forEach((p,i)=>{
+  const colour=material(colours[i%colours.length]);
+
+  platform(p[0],p[1],p[2],p[3],p[4],colour);
+
+  cube(
+   p[0],p[1]-.32,p[2],
+   p[3]+.15,.12,p[4]+.15,dark
+  );
+
+  if(i%2===0) makeCoin(p[0],p[2]);
+ });
+
+ // Lava pits below the course
+ const lava=material(0xff351f);
+ for(let i=0;i<7;i++){
+  cube(
+   (i%2===0?-1:1)*5,
+   -.65,
+   -12-i*9,
+   5,.15,5,lava
+  );
+ }
+
+ // Neon hazard walls
+ const neon=material(0xff39db);
+ for(let i=0;i<6;i++){
+  const z=-18-i*9;
+  cube(-7,2.5,z,.25,5,2,neon);
+  cube(7,2.5,z,.25,5,2,neon);
+ }
+
+ // Giant finish arch
+ cube(0,9,-82,12,.7,.7,gold);
+ cube(-6,7,-82,.7,4,.7,purple);
+ cube(6,7,-82,.7,4,.7,purple);
+
+ // Finish decorations
+ for(let i=0;i<8;i++){
+  const a=i*Math.PI/4;
+  const star=cube(
+   Math.cos(a)*4,
+   9,
+   -82+Math.sin(a)*4,
+   .5,.5,.5,
+   material(colours[i])
+  );
+ }
+
+}
   for(let i=0;i<25;i++){
    makeCoin((Math.random()-.5)*35,(Math.random()-.5)*35);
   }
@@ -865,7 +935,7 @@ document.getElementById('mailboxCash').textContent =
  document.getElementById('objective').style.display='block';
  document.getElementById('mode').textContent=selected.toUpperCase();
  const goals={
-  obby:'Reach the finish platform!',
+bby:'🌈 Complete 20 platforms and reach the giant finish arch!',
   simulator:'Collect coins and upgrade your speed!',
   survival:'Avoid danger and collect coins!',
 tycoon:'🏡 Choose your dream house, build it and collect money from your mailbox!',
@@ -1063,7 +1133,7 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
   if(health<=0)gameOver();
  }
 
- if(mode==='obby'&&player.position.z< -35&&player.position.y>2.5){
+ if(mode==='obby'&&player.position.z< -80&&player.position.y>5){
   coins+=50;
   say('🏆 OBBY COMPLETE! +50 COINS');
   playing=false;
