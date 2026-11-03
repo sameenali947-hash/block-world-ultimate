@@ -349,15 +349,29 @@ function addObject(o){
 
 function makePlayer(){
  const g=new THREE.Group();
+
+ // Body and head
  const shirt=cube(0,1.1,0,.8,.9,.5,material(avatarColor),g);
  g.userData.shirt=shirt;
+
  cube(0,1.85,0,.62,.62,.62,skin,g);
+
+ // Eyes
  cube(-.14,1.9,.32,.07,.08,.03,dark,g);
  cube(.14,1.9,.32,.07,.08,.03,dark,g);
+
+ // Arms
+ const arms=[];
+ arms.push(cube(-.57,1.15,0,.28,.85,.32,skin,g));
+ arms.push(cube(.57,1.15,0,.28,.85,.32,skin,g));
+ g.userData.arms=arms;
+
+ // Legs
  const legs=[];
  legs.push(cube(-.22,.4,0,.3,.7,.35,dark,g));
  legs.push(cube(.22,.4,0,.3,.7,.35,dark,g));
  g.userData.legs=legs;
+
  addObject(g);
  return g;
 }
