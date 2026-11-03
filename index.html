@@ -361,10 +361,20 @@ function makePlayer(){
  cube(.14,1.9,.32,.07,.08,.03,dark,g);
 
  // Arms
- const arms=[];
- arms.push(cube(-.57,1.15,0,.28,.85,.32,skin,g));
- arms.push(cube(.57,1.15,0,.28,.85,.32,skin,g));
- g.userData.arms=arms;
+const arms=[];
+
+const leftArm=new THREE.Group();
+leftArm.position.set(-.48,1.55,0);
+cube(0,-.4,0,.28,.85,.32,skin,leftArm);
+g.add(leftArm);
+arms.push(leftArm);
+
+const rightArm=new THREE.Group();
+rightArm.position.set(.48,1.55,0);
+cube(0,-.4,0,.28,.85,.32,skin,rightArm);
+g.add(rightArm);
+
+g.userData.arms=arms;
 
  // Legs
  const legs=[];
