@@ -935,7 +935,7 @@ if(mode==='obby'){
  document.getElementById('objective').style.display='block';
  document.getElementById('mode').textContent=selected.toUpperCase();
  const goals={
-bby:'🌈 Complete 20 platforms and reach the giant finish arch!',
+obby:'🌈 Complete 20 platforms and reach the giant finish arch!',
   simulator:'Collect coins and upgrade your speed!',
   survival:'Avoid danger and collect coins!',
 tycoon:'🏡 Choose your dream house, build it and collect money from your mailbox!',
@@ -1067,7 +1067,7 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
 
   if(mode==='obby'){
    player.position.x=THREE.MathUtils.clamp(player.position.x,-8,8);
-   player.position.z=THREE.MathUtils.clamp(player.position.z,-44,10);
+ player.position.z=THREE.MathUtils.clamp(player.position.z,-85,10);
   }
 
   const previousFeet=player.position.y;
