@@ -528,7 +528,6 @@ function collectTycoonCash(){
 
   updateHUD();
 }
-
 document.getElementById('collectCash').addEventListener(
   'click',
   collectTycoonCash
@@ -546,6 +545,14 @@ function buildWorld(){
 function start(selected){
  mode=selected;
  coins=0;
+ // RESET DREAM HOUSE TYCOON
+uncollectedCash = 0;
+houseBuilt = false;
+tycoonBuilds.clear();
+tycoonParts = [];
+
+document.getElementById('mailboxCash').textContent =
+  '💰 Waiting for earnings: 0';
  health=100;
  level=1;
  speed=5;
@@ -668,7 +675,7 @@ function start(selected){
   obby:'Reach the finish platform!',
   simulator:'Collect coins and upgrade your speed!',
   survival:'Avoid danger and collect coins!',
-  tycoon:'Collect 15 coins and press E to build!',
+tycoon:'🏡 Choose your dream house, build it and collect money from your mailbox!',
   roleplay:'Explore the city and meet people!',
   pvp:'Challenge the training bots and collect coins!',
   parkour:'Jump across the floating platforms!',
@@ -733,6 +740,7 @@ window.goMenu=()=>{
  playing=false;
  document.getElementById('menu').style.display='flex';
  document.getElementById('hud').style.display='none';
+ document.getElementById('tycoonPanel').style.display='none';
  document.getElementById('objective').style.display='none';
  document.getElementById('shootButton').style.display='none';
 };
