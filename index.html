@@ -48,6 +48,104 @@ button:hover{filter:brightness(1.2);transform:translateY(-2px)}
 .control{font-size:25px;padding:18px;background:#172b50cc;touch-action:none}
 #help{position:fixed;bottom:15px;right:15px;background:#172b50cc;padding:10px;border-radius:10px;z-index:3}
 @media(max-width:760px){.modes{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.mode{min-height:85px}.mode span{font-size:27px}.panel{padding:16px}#help{display:none}.control{padding:16px}#controls{display:flex}}
+ /* BLOCK WORLD ULTIMATE - VISUAL MAKEOVER */
+
+body {
+  background: #07152f;
+  font-family: Arial, sans-serif;
+}
+
+#menu {
+  background:
+    radial-gradient(ellipse at 50% 0%, #328dff66, transparent 55%),
+    linear-gradient(135deg, #07152fdd, #241052ee, #07152fee);
+  backdrop-filter: blur(5px);
+}
+
+.panel {
+  background: linear-gradient(145deg, #142f60f5, #101638f5);
+  border: 2px solid #65d9ff;
+  border-radius: 30px;
+  box-shadow:
+    0 0 25px #21baff55,
+    0 25px 70px #0009;
+}
+
+h1 {
+  letter-spacing: 4px;
+  background: linear-gradient(90deg, #fff17a, #ff9cdb, #72eaff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
+.lobby-welcome {
+  background: linear-gradient(120deg, #087dc9, #713bd0, #e34d9a);
+  box-shadow: 0 10px 30px #0005;
+}
+
+.lobby-features button {
+  background: linear-gradient(145deg, #244d83, #142448);
+  border: 1px solid #75dfff88;
+  min-height: 85px;
+  box-shadow: 0 5px #091832;
+}
+
+.modes {
+  gap: 15px;
+}
+
+.mode {
+  background: linear-gradient(145deg, #35caff, #3154c9, #6238b9);
+  border: 1px solid #ffffff55;
+  box-shadow: 0 6px #172d70, 0 0 12px #36aaff33;
+  transition: transform .2s, filter .2s, box-shadow .2s;
+}
+
+.mode:hover {
+  transform: translateY(-5px) scale(1.03);
+  filter: brightness(1.25);
+  box-shadow: 0 9px #172d70, 0 0 22px #39caff88;
+}
+
+button {
+  transition: transform .2s, filter .2s;
+}
+
+#avatarEditor {
+  background: linear-gradient(145deg, #182e60, #101b3d);
+  border: 1px solid #67d8ff88;
+  box-shadow: 0 5px 20px #0004;
+}
+
+#tycoonPanel {
+  box-shadow: 0 0 25px #ffdf5555, 0 10px 30px #0008;
+  backdrop-filter: blur(12px);
+}
+
+.stat {
+  background: linear-gradient(145deg, #234c83ee, #102344ee);
+  border: 1px solid #75dfff88;
+  box-shadow: 0 4px 15px #0004;
+}
+
+#objective {
+  border: 1px solid #70dfff88;
+  box-shadow: 0 5px 20px #0005;
+}
+
+#message {
+  border: 2px solid #70dfff;
+  box-shadow: 0 0 30px #32baff88;
+}
+
+@media(max-width:760px) {
+  .panel {
+    max-height: 96vh;
+    overflow-y: auto;
+  }
+}
 </style>
 </head>
 <body>
@@ -958,6 +1056,13 @@ document.querySelectorAll('[data-build]').forEach(button => {
     buildTycoonPart(button.dataset.build);
   });
 });
+ // Make menu buttons work
+window.openAvatarShop = openAvatarShop;
+window.dailyReward = dailyReward;
+window.meetNPCs = meetNPCs;
+window.changeAvatar = changeAvatar;
+window.changeAvatarStyle = changeAvatarStyle;
+window.shoot = shoot;
 animate();
 </script>
 </body>
