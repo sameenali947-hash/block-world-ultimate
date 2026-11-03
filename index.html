@@ -133,6 +133,39 @@ button:hover{filter:brightness(1.2);transform:translateY(-2px)}
  <button id="menuButton" onclick="goMenu()">☰ MENU</button>
 </div>
 <div id="objective"></div>
+ <div id="tycoonPanel" style="display:none;position:fixed;right:15px;top:120px;width:260px;max-height:65vh;overflow:auto;background:#172b50ee;border:2px solid #ffdf55;border-radius:18px;padding:14px;z-index:4">
+  <h2>🏡 DREAM HOUSE TYCOON</h2>
+
+  <label>🏠 CHOOSE YOUR DREAM HOUSE</label>
+  <select id="houseChoice" style="width:100%;padding:10px;margin:8px 0;border-radius:8px">
+    <option value="tree">🌳 Tree House</option>
+    <option value="barbie">💗 Barbie House</option>
+    <option value="mansion">🏰 Mega Mansion</option>
+    <option value="cottage">🌸 Cottage</option>
+    <option value="beach">🏖️ Beach House</option>
+  </select>
+  <button id="chooseHouse" style="width:100%">🏡 CHOOSE HOUSE</button>
+
+  <hr>
+
+  <h3>🔨 BUILD YOUR HOUSE</h3>
+  <div id="buildButtons" style="display:grid;gap:8px">
+    <button data-build="foundation">🆓 Foundation — FREE</button>
+    <button data-build="walls">🧱 Walls — 50</button>
+    <button data-build="door">🚪 Door — 100</button>
+    <button data-build="windows">🪟 Windows — 150</button>
+    <button data-build="floor2">🏠 Second Floor — 300</button>
+    <button data-build="roof">🏡 Roof — 500</button>
+    <button data-build="pool">🏊 Swimming Pool — 800</button>
+    <button data-build="garden">🌴 Garden — 1,000</button>
+  </div>
+
+  <hr>
+  <h3>📬 MONEY MAILBOX</h3>
+  <p id="mailboxCash">💰 Waiting for earnings: 0</p>
+  <button id="collectCash" style="width:100%;background:linear-gradient(#27c978,#13834b)">📬 COLLECT CASH</button>
+  <p id="tycoonStatus">Choose a house to begin!</p>
+</div>
 <div id="message"></div>
 <div id="help">WASD Move | SPACE Jump | E Interact</div>
 <div id="controls">
@@ -185,6 +218,12 @@ const green=material(0x27a86a);
 const white=material(0xffffff);
 
 let player,mode='obby',playing=false;
+ // DREAM HOUSE TYCOON
+let selectedHouse = 'tree';
+let houseBuilt = false;
+let tycoonBuilds = new Set();
+let tycoonParts = [];
+let uncollectedCash = 0;
 let keys={},touch={},objects=[],coins=0,health=100,level=1;
 let speed=5,vy=0,onGround=false,buildings=0,frame=0;
 let avatarColor=0x3479ee, avatarStyle='classic', car=null, targets=[], shots=[];
@@ -320,7 +359,180 @@ function npc(x,z,mat=purple){
  g.userData.npc=true;
  addObject(g);
 }
+// DREAM HOUSE TYCOON
+function addTycoonPart(x,y,z,w,h,d,mat){
+  const part = cube(x,y,z,w,h,d,mat);
+  tycoonParts.push(part);
+  objects.push(part);
+  return part;
+}
 
+function clearTycoonHouse(){
+  for(const part of tycoonParts){
+    scene.remove(part);
+    objects = objects.filter(o => o !== part);
+  }
+  tycoonParts = [];
+  tycoonBuilds.clear();
+  houseBuilt = false;
+}
+
+function chooseTycoonHouse(){
+  selectedHouse = document.getElementById('houseChoice').value;
+  clearTycoonHouse();
+
+  const names = {
+    tree:'🌳 Tree House',
+    barbie:'💗 Barbie House',
+    mansion:'🏰 Mega Mansion',
+    cottage:'🌸 Cottage',
+    beach:'🏖️ Beach House'
+  };
+
+  document.getElementById('tycoonStatus').textContent =
+    names[selectedHouse] + ' selected! Build your foundation first.';
+
+  document.getElementById('mailboxCash').textContent =
+    '💰 Waiting for earnings: ' + uncollectedCash;
+}
+
+function buildTycoonPart(type){
+  if(!playing || mode !== 'tycoon') return;
+
+  const prices = {
+    foundation:0,
+    walls:50,
+    door:100,
+    windows:150,
+    floor2:300,
+    roof:500,
+    pool:800,
+    garden:1000
+  };
+
+  const names = {
+    foundation:'Foundation',
+    walls:'Walls',
+    door:'Door',
+    windows:'Windows',
+    floor2:'Second Floor',
+    roof:'Roof',
+    pool:'Swimming Pool',
+    garden:'Garden'
+  };
+
+  if(tycoonBuilds.has(type)){
+    say('You already built that!');
+    return;
+  }
+
+  if(type !== 'foundation' && !tycoonBuilds.has('foundation')){
+    say('Build your free foundation first!');
+    return;
+  }
+
+  const price = prices[type];
+
+  if(coins < price){
+    say('You need ' + price + ' coins!');
+    return;
+  }
+
+  coins -= price;
+
+  const pink = material(0xff75c3);
+  const aqua = material(0x20c9c3);
+  const cream = material(0xffdfaa);
+  const mansionWhite = material(0xf2f4ff);
+  const glass = material(0x75dfff);
+  const wood = material(0x9b6238);
+  const houseColor = {
+    tree:wood,
+    barbie:pink,
+    mansion:mansionWhite,
+    cottage:cream,
+    beach:aqua
+  }[selectedHouse];
+
+  if(type === 'foundation'){
+    addTycoonPart(0,.2,-10,10,.4,8,houseColor);
+
+    if(selectedHouse === 'tree'){
+      addTycoonPart(0,2,-10,1,4,1,wood);
+      addTycoonPart(0,4,-10,9,.5,8,wood);
+    }
+    houseBuilt = true;
+  }
+
+  if(type === 'walls'){
+    const y = selectedHouse === 'tree' ? 5 : 2;
+    const z = selectedHouse === 'tree' ? -10 : -10;
+    addTycoonPart(0,y,z-3.8,10,4,.4,houseColor);
+    addTycoonPart(-4.8,y,z, .4,4,8,houseColor);
+    addTycoonPart(4.8,y,z, .4,4,8,houseColor);
+    addTycoonPart(0,y,z+3.8,10,4,.4,houseColor);
+  }
+
+  if(type === 'door'){
+    addTycoonPart(0,1.5,-6,1.5,3,.25,wood);
+  }
+
+  if(type === 'windows'){
+    for(const x of [-3,3]){
+      addTycoonPart(x,2.5,-6.05,1.5,1.3,.15,glass);
+    }
+  }
+
+  if(type === 'floor2'){
+    addTycoonPart(0,4,-10,9,.35,7,houseColor);
+    addTycoonPart(-4,5.5,-10,.4,3,7,houseColor);
+    addTycoonPart(4,5.5,-10,.4,3,7,houseColor);
+  }
+
+  if(type === 'roof'){
+    addTycoonPart(0,4.5,-10,11,.5,9,selectedHouse === 'barbie' ? pink : red);
+  }
+
+  if(type === 'pool'){
+    addTycoonPart(8,.05,-10,5,.2,4,aqua);
+    addTycoonPart(8,.25,-12,5,.4,.3,white);
+    addTycoonPart(8,.25,-8,5,.4,.3,white);
+  }
+
+  if(type === 'garden'){
+    for(const x of [-7,7]){
+      addTycoonPart(x,1,-10,.5,2,.5,wood);
+      addTycoonPart(x,2.5,-10,2,2,2,green);
+    }
+  }
+
+  tycoonBuilds.add(type);
+  document.getElementById('tycoonStatus').textContent =
+    '✅ Built: ' + names[type] + '!';
+
+  updateHUD();
+}
+ // DREAM HOUSE TYCOON MAILBOX
+function collectTycoonCash(){
+  if(uncollectedCash <= 0){
+    say('📬 No money to collect yet!');
+    return;
+  }
+
+  coins += uncollectedCash;
+  say('💰 COLLECTED ' + uncollectedCash + ' COINS!');
+  uncollectedCash = 0;
+
+  document.getElementById('mailboxCash').textContent =
+    '💰 Waiting for earnings: 0';
+
+  updateHUD();
+}
+
+document.getElementById('collectCash').addEventListener(
+  'click',
+  collectTycoonCash
+);
 function buildWorld(){
  platform(0,-.4,0,50,50);
  cube(0,-1.2,0,50,1.2,50,dirt);
@@ -448,6 +660,8 @@ function start(selected){
 
  document.getElementById('menu').style.display='none';
  document.getElementById('hud').style.display='flex';
+ document.getElementById('tycoonPanel').style.display =
+  selected === 'tycoon' ? 'block' : 'none';
  document.getElementById('objective').style.display='block';
  document.getElementById('mode').textContent=selected.toUpperCase();
  const goals={
@@ -548,6 +762,13 @@ document.querySelectorAll('[data-key]').forEach(b=>{
 
 function update(dt){
  frame++;
+ // TYCOON MAILBOX PASSIVE INCOME
+if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
+  uncollectedCash += 10 + tycoonBuilds.size * 5;
+
+  document.getElementById('mailboxCash').textContent =
+    '💰 Waiting for earnings: ' + uncollectedCash;
+}
  const left=keys.a||keys.arrowleft||touch.a;
  const right=keys.d||keys.arrowright||touch.d;
  const forward=keys.w||keys.arrowup;
@@ -721,7 +942,14 @@ window.addEventListener('resize',()=>{
  camera.updateProjectionMatrix();
  renderer.setSize(innerWidth,innerHeight);
 });
+// CONNECT DREAM HOUSE TYCOON BUTTONS
+document.getElementById('chooseHouse').addEventListener('click', chooseTycoonHouse);
 
+document.querySelectorAll('[data-build]').forEach(button => {
+  button.addEventListener('click', () => {
+    buildTycoonPart(button.dataset.build);
+  });
+});
 animate();
 </script>
 </body>
