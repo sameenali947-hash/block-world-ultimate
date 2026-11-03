@@ -1164,6 +1164,16 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
  }
 
  updateHUD();
+ if(Math.abs(dx)+Math.abs(dz)>.1 && mode!=='cars'){
+ const swing=Math.sin(frame*.22)*.65;
+ player.userData.legs[0].rotation.x=swing;
+ player.userData.legs[1].rotation.x=-swing;
+ player.userData.arms[0].rotation.x=-swing;
+ player.userData.arms[1].rotation.x=swing;
+}else if(mode!=='cars'){
+ player.userData.legs.forEach(l=>l.rotation.x=0);
+ player.userData.arms.forEach(a=>a.rotation.x=0);
+}
 }
 function openAvatarShop(){
   const shop=document.getElementById('avatarEditor');
