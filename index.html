@@ -288,6 +288,12 @@ scene.background=new THREE.Color(0x82d7ff);
 scene.fog=new THREE.Fog(0x82d7ff,35,100);
 
 const camera=new THREE.PerspectiveCamera(65,innerWidth/innerHeight,.1,200);
+ let cameraView=3; // 1=first person, 2=front view, 3=third person
+let cameraYaw=0;
+let cameraPitch=0.25;
+let draggingCamera=false;
+let lastMouseX=0;
+let lastMouseY=0;
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setSize(innerWidth,innerHeight);
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
@@ -295,7 +301,27 @@ renderer.shadowMap.enabled=true;
 renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.outputColorSpace=THREE.SRGBColorSpace;
 document.getElementById('game').appendChild(renderer.domElement);
+renderer.domElement.addEventListener('pointerdown',e=>{
+ draggingCamera=true;
+ lastMouseX=e.clientX;
+ lastMouseY=e.clientY;
+});
 
+window.addEventListener('pointerup',()=>{
+ draggingCamera=false;
+});
+
+window.addEventListener('pointermove',e=>{
+ if(!draggingCamera || !playing)return;
+
+ cameraYaw-=(e.clientX-lastMouseX)*0.006;
+ cameraPitch-=(e.clientY-lastMouseY)*0.006;
+
+ cameraPitch=THREE.MathUtils.clamp(cameraPitch,-0.8,1.1);
+
+ lastMouseX=e.clientX;
+ lastMouseY=e.clientY;
+});
 scene.add(new THREE.HemisphereLight(0xffffff,0x668855,2));
 const sun=new THREE.DirectionalLight(0xffffff,3);
 sun.position.set(-20,35,20);
@@ -1098,6 +1124,18 @@ window.addEventListener('keydown',e=>{
  if(e.key.toLowerCase()==='e')interact();
  if(e.key.toLowerCase()==='f')shoot();
  if(e.key==='Escape')goMenu();
+ if(e.key.toLowerCase()==='v'){
+ cameraView++;
+ if(cameraView>3)cameraView=1;
+
+ const names={
+  1:'FIRST PERSON',
+  2:'FRONT VIEW',
+  3:'THIRD PERSON'
+ };
+
+ say('CAMERA: '+names[cameraView]);
+}
 });
 window.addEventListener('keyup',e=>keys[e.key.toLowerCase()]=false);
 window.addEventListener('blur',()=>{
@@ -1276,18 +1314,40 @@ function gameOver(){
 
  if(playing&&player){
   update(dt);
-  const target=new THREE.Vector3(
+
+  let target=new THREE.Vector3(
    player.position.x,
-   player.position.y+5,
-   player.position.z+9
+   player.position.y+1.5,
+   player.position.z
   );
-  camera.position.lerp(target,.09);
-  camera.lookAt(
-   player.position.x,
-   player.position.y+1,
-   player.position.z-3
-  );
- }
+
+  let distance=8;
+
+  if(cameraView===1){
+   camera.position.set(
+    player.position.x,
+    player.position.y+1.8,
+    player.position.z
+   );
+   target.set(
+    player.position.x+Math.sin(cameraYaw)*10,
+    player.position.y+1.8+cameraPitch,
+    player.position.z-Math.cos(cameraYaw)*10
+   );
+
+  }else{
+   if(cameraView===2) distance=5;
+   if(cameraView===3) distance=8;
+
+   camera.position.set(
+    player.position.x+Math.sin(cameraYaw)*distance,
+    player.position.y+2+cameraPitch*5,
+    player.position.z+Math.cos(cameraYaw)*distance
+   );
+  }
+
+  camera.lookAt(target);
+}
 
  for(const s of [...shots]){
   s.life-=dt;
