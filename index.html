@@ -359,7 +359,9 @@ function makePlayer(){
   new THREE.SphereGeometry(.38,24,24),
   skin
  );
- head.position.set(0,1.95,0);
+head.position.x=0;
+head.position.y=1.95;
+head.position.z=0;
  head.castShadow=true;
  g.add(head);
 
@@ -382,7 +384,7 @@ function makePlayer(){
   new THREE.SphereGeometry(.39,20,12,0,Math.PI*2,0,Math.PI/2),
   hair
  );
- hair.position.set(0,2.08,0);
+ hairCap.position.set(0,2.08,0);
  g.add(hairCap);
 
  // ARMS WITH SHOULDER JOINTS
@@ -391,7 +393,9 @@ function makePlayer(){
 
  for(const side of [-1,1]){
   const arm=new THREE.Group();
-  arm.position.set(side*.53,1.55,0);
+  arm.position.x=side*.53;
+arm.position.y=1.55;
+arm.position.z=0;
 
   const upper=new THREE.Mesh(
    new THREE.CapsuleGeometry(.14,.55,5,12),
