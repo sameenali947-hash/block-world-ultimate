@@ -12,6 +12,28 @@ body{margin:0;overflow:hidden;font-family:Arial,sans-serif;background:#78d5ff;co
 .panel{background:linear-gradient(145deg,#102f63ee,#071d42f2);padding:24px;border:2px solid #56c9ff;border-radius:28px;width:min(1120px,96vw);max-height:94vh;overflow:auto;text-align:center;box-shadow:0 20px 60px #10204499} #avatarEditor{margin:14px auto;padding:12px;background:#071d42aa;border:1px solid #ffffff44;border-radius:14px;display:flex;gap:12px;align-items:center;justify-content:center;flex-wrap:wrap} #avatarEditor select{padding:9px;border-radius:9px;font-weight:bold}
 h1{font-size:clamp(32px,6vw,58px);margin:5px;color:#ffdf55;text-shadow:0 5px #a65c25}
 p{color:#d5e7ff}
+ .lobby-welcome{
+  background:linear-gradient(120deg,#087dc9,#713bd0,#e34d9a);
+  padding:18px;
+  margin:15px 0;
+  border:2px solid #ffffff88;
+  border-radius:20px;
+}
+.lobby-features{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:18px 0;
+}
+.lobby-features div{
+  background:#10264ddd;
+  padding:15px 8px;
+  border-radius:14px;
+}
+.lobby-features small{color:#d5e7ff}
+@media(max-width:600px){
+  .lobby-features{grid-template-columns:1fr}
+}
 .modes{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-top:22px}
 button{border:0;border-radius:15px;padding:15px 8px;color:white;font-weight:bold;font-size:15px;cursor:pointer;background:linear-gradient(#579bff,#3154a7);box-shadow:0 5px #203c79}
 button:hover{filter:brightness(1.2);transform:translateY(-2px)}
@@ -36,6 +58,16 @@ button:hover{filter:brightness(1.2);transform:translateY(-2px)}
   <h1>BLOCK WORLD</h1>
   <h2>ULTIMATE 🌎</h2>
   <p>Explore • Build • Survive • Become a legend!</p>
+  <div class="lobby-welcome">
+  <h2>🏙️ WELCOME TO BLOCK CITY!</h2>
+   <div class="lobby-features">
+  <p>Meet friends, customise your avatar and explore amazing worlds!</p>
+    <div>🛍️ <b>AVATAR SHOP</b><br><small>Discover new outfits</small></div>
+    <div>🎁 <b>DAILY REWARDS</b><br><small>Claim your gifts</small></div>
+    <div>👥 <b>MEET NPCs</b><br><small>Make new friends</small></div>
+  </div>
+  <h2>🌀 CHOOSE YOUR PORTAL</h2>
+</div>
   <div class="modes">
    <button class="mode" onclick="start('obby')"><span>🏃</span>OBBY</button>
    <button class="mode" onclick="start('simulator')"><span>🪙</span>SIMULATOR</button>
