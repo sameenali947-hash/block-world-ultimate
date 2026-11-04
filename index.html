@@ -529,6 +529,25 @@ function solidCube(x,y,z,w,h,d,mat){
  objects.push(o);
  return o;
 }
+ function solidCube(x,y,z,w,h,d,mat){
+ const o=cube(x,y,z,w,h,d,mat);
+ o.userData.solid=true;
+ o.userData.width=w;
+ o.userData.height=h;
+ o.userData.depth=d;
+ objects.push(o);
+ return o;
+}
+
+function hazardCube(x,y,z,w,h,d,mat){
+ const o=cube(x,y,z,w,h,d,mat);
+ o.userData.hazard=true;
+ o.userData.width=w;
+ o.userData.height=h;
+ o.userData.depth=d;
+ objects.push(o);
+ return o;
+}
 function platform(x,y,z,w,d,mat=grass){
  const p=cube(x,y,z,w,.6,d,mat);
  p.userData.platform=true;
@@ -923,21 +942,24 @@ if(mode==='obby'){
 
  // Lava pits below the course
  const lava=material(0xff351f);
- for(let i=0;i<7;i++){
-  cube(
-   (i%2===0?-1:1)*5,
-   -.65,
-   -12-i*9,
-   5,.15,5,lava
-  );
- }
 
+for(let i=0;i<7;i++){
+  const lavaBlock=cube(
+    (i%2===0?-1:1)*5,
+    -.65,
+    -12-i*9,
+    5,.15,5,lava
+  );
+
+  lavaBlock.userData.hazard=true;
+  objects.push(lavaBlock);
+}
  // Neon hazard walls
  const neon=material(0xff39db);
  for(let i=0;i<6;i++){
   const z=-18-i*9;
-  cube(-7,2.5,z,.25,5,2,neon);
-  cube(7,2.5,z,.25,5,2,neon);
+solidCube(-7,2.5,z,.25,5,2,neon);
+solidCube(7,2.5,z,.25,5,2,neon);
  }
 
  // Giant finish arch
@@ -1245,6 +1267,25 @@ for(const o of objects){
    vy=0;
    onGround=true;
   }
+  if(mode==='obby'){
+  for(const o of objects){
+    if(o.userData.hazard && o.visible){
+      const touching =
+        Math.abs(player.position.x-o.position.x)<2.8 &&
+        Math.abs(player.position.z-o.position.z)<2.8 &&
+        player.position.y<1;
+
+      if(touching){
+        health-=10;
+        player.position.set(0,0,5);
+        vy=0;
+        say('🔥 Lava! -10 health');
+        if(health<=0)gameOver();
+        break;
+      }
+    }
+  }
+}
   if(player.position.y< -12){
    player.position.set(0,0,5);
    vy=0;
