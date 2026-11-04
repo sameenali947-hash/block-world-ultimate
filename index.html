@@ -529,15 +529,6 @@ function solidCube(x,y,z,w,h,d,mat){
  objects.push(o);
  return o;
 }
- function solidCube(x,y,z,w,h,d,mat){
- const o=cube(x,y,z,w,h,d,mat);
- o.userData.solid=true;
- o.userData.width=w;
- o.userData.height=h;
- o.userData.depth=d;
- objects.push(o);
- return o;
-}
 
 function hazardCube(x,y,z,w,h,d,mat){
  const o=cube(x,y,z,w,h,d,mat);
