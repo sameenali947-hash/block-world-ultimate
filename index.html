@@ -520,7 +520,15 @@ function shoot(){
   say('🎯 Target hit! +1 coin');
  }
 }
-
+function solidCube(x,y,z,w,h,d,mat){
+ const o=cube(x,y,z,w,h,d,mat);
+ o.userData.solid=true;
+ o.userData.width=w;
+ o.userData.height=h;
+ o.userData.depth=d;
+ objects.push(o);
+ return o;
+}
 function platform(x,y,z,w,d,mat=grass){
  const p=cube(x,y,z,w,.6,d,mat);
  p.userData.platform=true;
@@ -1190,7 +1198,29 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
  player.position.z=THREE.MathUtils.clamp(player.position.z,-85,10);
   }
 
-  const previousFeet=player.position.y;
+  // SAVE THE PLAYER'S POSITION
+const oldX=player.position.x;
+const oldZ=player.position.z;
+const previousFeet=player.position.y;
+
+// WALL AND BUILDING COLLISION
+for(const o of objects){
+ if(!o.userData.solid)continue;
+
+ const insideX=Math.abs(player.position.x-o.position.x)<o.userData.width/2+.4;
+ const insideZ=Math.abs(player.position.z-o.position.z)<o.userData.depth/2+.4;
+
+ const playerBottom=player.position.y;
+ const playerTop=player.position.y+2.2;
+ const wallBottom=o.position.y-o.userData.height/2;
+ const wallTop=o.position.y+o.userData.height/2;
+
+ if(insideX&&insideZ&&playerTop>wallBottom&&playerBottom<wallTop){
+  player.position.x=oldX;
+  player.position.z=oldZ;
+  break;
+ }
+}
   vy-=24*dt;
   player.position.y+=vy*dt;
   onGround=false;
