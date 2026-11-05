@@ -883,7 +883,7 @@ document.getElementById('mailboxCash').textContent =
  shots=[];
 
  clearWorld();
- buildWorld();
+if(mode !== 'obby') buildWorld();
 
  player=makePlayer();
  player.position.set(0,0,5);
