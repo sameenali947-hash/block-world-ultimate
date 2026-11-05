@@ -542,6 +542,9 @@ function hazardCube(x,y,z,w,h,d,mat){
 function platform(x,y,z,w,d,mat=grass){
  const p=cube(x,y,z,w,.6,d,mat);
  p.userData.platform=true;
+ p.userData.width=w;
+ p.userData.height=.6;
+ p.userData.depth=d;
  objects.push(p);
  return p;
 }
@@ -886,7 +889,7 @@ document.getElementById('mailboxCash').textContent =
 if(mode !== 'obby') buildWorld();
 
  player=makePlayer();
- player.position.set(0,0,5);
+ player.position.set(0,.2,5);
 
 if(mode==='obby'){
 
@@ -896,26 +899,26 @@ if(mode==='obby'){
  ];
 
  const course=[
- [0,-.1,3,7,7],
-  [3,1.3,-7,2.5,2.5],
-  [-2,1.6,-11,2.2,2.2],
-  [2,2,-15,2,2],
-  [5,2.3,-19,2,2],
-  [0,2.6,-23,2.5,2],
-  [-4,2.9,-27,2,2],
-  [1,3.2,-31,2,2],
-  [5,3.5,-35,1.8,1.8],
-  [0,3.8,-39,2,2],
-  [-5,4.1,-43,1.8,1.8],
-  [-1,4.4,-47,2,2],
-  [4,4.7,-51,1.8,1.8],
-  [0,5,-55,2,2],
-  [-4,5.3,-59,1.8,1.8],
-  [2,5.6,-63,2,2],
-  [5,5.9,-67,1.8,1.8],
-  [0,6.2,-71,2.5,2.5],
-  [-3,6.5,-75,2,2],
-  [0,6.8,-79,12,10]
+  [0,-.1,3,8,8],
+  [2,.25,-2,3.5,3.5],
+  [-1,.6,-6,3.5,3.5],
+  [2,.95,-10,3.5,3.5],
+  [4,1.3,-14,3.5,3.5],
+  [1,1.65,-18,3.5,3.5],
+  [-2,2,-22,3.5,3.5],
+  [1,2.35,-26,3.5,3.5],
+  [4,2.7,-30,3.5,3.5],
+  [1,3.05,-34,3.5,3.5],
+  [-2,3.4,-38,3.5,3.5],
+  [1,3.75,-42,3.5,3.5],
+  [4,4.1,-46,3.5,3.5],
+  [1,4.45,-50,3.5,3.5],
+  [-2,4.8,-54,3.5,3.5],
+  [1,5.15,-58,3.5,3.5],
+  [4,5.5,-62,3.5,3.5],
+  [1,5.85,-66,3.5,3.5],
+  [-2,6.2,-70,3.5,3.5],
+  [0,6.55,-74,12,10]
  ];
 
  course.forEach((p,i)=>{
@@ -1098,7 +1101,7 @@ function say(text){
 
 function jump(){
  if(playing&&onGround){
-  vy=9;
+  vy=10.5;
   onGround=false;
  }
 }
@@ -1201,39 +1204,34 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
   player.position.copy(car.position);
   player.position.y=-10;
  }else{
-  player.position.x+=dx*speed*dt;
-  player.position.z+=dz*speed*dt;
-  player.position.x=THREE.MathUtils.clamp(player.position.x,-23,23);
-  player.position.z=THREE.MathUtils.clamp(player.position.z,-55,30);
+  const previousFeet=player.position.y;
 
-  if(mode==='obby'){
-   player.position.x=THREE.MathUtils.clamp(player.position.x,-8,8);
- player.position.z=THREE.MathUtils.clamp(player.position.z,-85,10);
+  // Move one axis at a time; solid walls and platform sides block entry.
+  const minX=mode==='obby'?-8:-23;
+  const maxX=mode==='obby'?8:23;
+  const minZ=mode==='obby'?-85:-55;
+  const maxZ=mode==='obby'?10:30;
+
+  function blockedAt(testX,testZ){
+   const playerBottom=player.position.y+.04;
+   const playerTop=player.position.y+2.15;
+   for(const o of objects){
+    if(!o.userData.solid&&!o.userData.platform)continue;
+    const insideX=Math.abs(testX-o.position.x)<o.userData.width/2+.36;
+    const insideZ=Math.abs(testZ-o.position.z)<o.userData.depth/2+.36;
+    const blockBottom=o.position.y-o.userData.height/2;
+    const blockTop=o.position.y+o.userData.height/2;
+    if(insideX&&insideZ&&playerTop>blockBottom+.02&&playerBottom<blockTop-.02) return true;
+   }
+   return false;
   }
 
-  // SAVE THE PLAYER'S POSITION
-const oldX=player.position.x;
-const oldZ=player.position.z;
-const previousFeet=player.position.y;
+  const nextX=THREE.MathUtils.clamp(player.position.x+dx*speed*dt,minX,maxX);
+  if(!blockedAt(nextX,player.position.z)) player.position.x=nextX;
 
-// WALL AND BUILDING COLLISION
-for(const o of objects){
- if(!o.userData.solid)continue;
+  const nextZ=THREE.MathUtils.clamp(player.position.z+dz*speed*dt,minZ,maxZ);
+  if(!blockedAt(player.position.x,nextZ)) player.position.z=nextZ;
 
- const insideX=Math.abs(player.position.x-o.position.x)<o.userData.width/2+.4;
- const insideZ=Math.abs(player.position.z-o.position.z)<o.userData.depth/2+.4;
-
- const playerBottom=player.position.y;
- const playerTop=player.position.y+2.2;
- const wallBottom=o.position.y-o.userData.height/2;
- const wallTop=o.position.y+o.userData.height/2;
-
- if(insideX&&insideZ&&playerTop>wallBottom&&playerBottom<wallTop){
-  player.position.x=oldX;
-  player.position.z=oldZ;
-  break;
- }
-}
   vy-=24*dt;
   player.position.y+=vy*dt;
   onGround=false;
@@ -1264,7 +1262,7 @@ for(const o of objects){
       const touching =
         Math.abs(player.position.x-o.position.x)<2.8 &&
         Math.abs(player.position.z-o.position.z)<2.8 &&
-        player.position.y<1;
+        player.position.y<-.3;
 
       if(touching){
         health-=10;
