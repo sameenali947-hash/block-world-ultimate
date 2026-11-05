@@ -146,10 +146,62 @@ button {
     overflow-y: auto;
   }
 }
+
+/* Obby tower and live UGC preview shop */
+.obby-shop-overlay{display:none;position:fixed;inset:0;z-index:15;align-items:center;justify-content:flex-start;padding:14px;background:#07152f88;backdrop-filter:blur(2px)}
+.obby-shop-panel{width:min(520px,96vw);max-height:94vh;overflow:auto;background:linear-gradient(145deg,#172d55f5,#15112cf5);border:2px solid #8cecff;border-radius:22px;padding:18px;box-shadow:0 16px 45px #0009}
+.obby-shop-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.obby-shop-heading h2{margin:4px 0}.obby-shop-heading p{margin:5px 0 10px}
+.shop-close{background:#b83c59;padding:9px 14px}
+.shop-balance{background:#10264a;border:1px solid #8cecff77;border-radius:12px;padding:11px;font-weight:bold;font-size:19px}
+.shop-preview-text{padding:9px 11px;background:#263c66;border-radius:10px;font-size:13px}
+.shop-items{display:grid;gap:8px}
+.shop-item{display:grid;grid-template-columns:42px minmax(0,1fr) auto auto;align-items:center;gap:7px;background:#ffffff10;border:1px solid #ffffff22;border-radius:12px;padding:8px}
+.shop-icon{font-size:27px;text-align:center}
+.shop-item b,.shop-item small,.shop-item strong{display:block}
+.shop-item b{font-size:14px}.shop-item small{font-size:10px;color:#bcd1ee;margin:3px 0}.shop-item strong{font-size:12px;color:#ffe27a}
+.shop-item button{font-size:10px;padding:9px 8px;border-radius:8px;box-shadow:none}
+.shop-item button:last-child{background:linear-gradient(#ffcf45,#bc7620);color:#251600}
+.shop-note{font-size:12px;margin-bottom:2px}
+#blockCoins{background:linear-gradient(135deg,#8e6515,#5a3c08);border-color:#ffd35a}
+@media(max-width:650px){.obby-shop-overlay{justify-content:center}.obby-shop-panel{max-height:90vh}.shop-item{grid-template-columns:34px minmax(0,1fr) auto auto}.shop-item button{padding:8px 5px}}
+
 </style>
 </head>
 <body>
 <div id="game"></div>
+
+<div id="genderPicker" style="display:none;position:fixed;inset:0;z-index:20;background:#07152fee;align-items:center;justify-content:center;padding:18px">
+ <div style="background:linear-gradient(145deg,#173e78,#26134e);border:3px solid #75dfff;border-radius:24px;padding:26px;max-width:620px;width:100%;text-align:center;box-shadow:0 15px 50px #0009">
+  <h1>CHOOSE YOUR BACON AVATAR</h1>
+  <p>This is your starter character. You can change accessories later!</p>
+  <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap">
+   <button onclick="chooseGender('boy')" style="min-width:210px;background:linear-gradient(#258edb,#164a9a)">👦 BOY BACON<br><small>Brown swept bacon hair</small></button>
+   <button onclick="chooseGender('girl')" style="min-width:210px;background:linear-gradient(#e65b9b,#963c83)">👧 GIRL BACON<br><small>Auburn tied-up bacon hair</small></button>
+  </div>
+ </div>
+</div>
+
+<div id="obbyShop" class="obby-shop-overlay">
+ <div class="obby-shop-panel">
+  <div class="obby-shop-heading">
+   <div><h2>🛍️ BLOCK WORLD UGC</h2><p>Preview accessories on your character before buying.</p></div>
+   <button onclick="closeObbyShop()" class="shop-close">✕</button>
+  </div>
+  <div id="blockCoinShopBalance" class="shop-balance">🪙 0 Block Coins</div>
+  <p id="shopPreviewText" class="shop-preview-text">Choose PREVIEW to try an item on your avatar. Your character is visible behind this window. Press V to switch camera views.</p>
+  <div class="shop-items">
+   <div class="shop-item"><div class="shop-icon">🧢</div><div><b>Starter Beanie</b><small>COMMON • Simple style</small><strong>75 Block Coins</strong></div><button onclick="previewObbyItem('beanie')">PREVIEW</button><button onclick="buyObbyItem('beanie')">BUY</button></div>
+   <div class="shop-item"><div class="shop-icon">🎀</div><div><b>Pink Bow</b><small>UNCOMMON • Cute style</small><strong>250 Block Coins</strong></div><button onclick="previewObbyItem('pinkBow')">PREVIEW</button><button onclick="buyObbyItem('pinkBow')">BUY</button></div>
+   <div class="shop-item"><div class="shop-icon">🕶️</div><div><b>Cool Shades</b><small>RARE • Street style</small><strong>500 Block Coins</strong></div><button onclick="previewObbyItem('coolGlasses')">PREVIEW</button><button onclick="buyObbyItem('coolGlasses')">BUY</button></div>
+   <div class="shop-item"><div class="shop-icon">🎧</div><div><b>Neon Headphones</b><small>EPIC • Glow style</small><strong>900 Block Coins</strong></div><button onclick="previewObbyItem('neonHeadphones')">PREVIEW</button><button onclick="buyObbyItem('neonHeadphones')">BUY</button></div>
+   <div class="shop-item"><div class="shop-icon">👑</div><div><b>Golden Crown</b><small>LEGENDARY • Royal style</small><strong>1,400 Block Coins</strong></div><button onclick="previewObbyItem('goldCrown')">PREVIEW</button><button onclick="buyObbyItem('goldCrown')">BUY</button></div>
+   <div class="shop-item"><div class="shop-icon">😇</div><div><b>Celestial Halo</b><small>LEGENDARY • Divine style</small><strong>1,800 Block Coins</strong></div><button onclick="previewObbyItem('halo')">PREVIEW</button><button onclick="buyObbyItem('halo')">BUY</button></div>
+   <div class="shop-item"><div class="shop-icon">🪽</div><div><b>Galaxy Wings</b><small>MYTHIC • Ultra rare</small><strong>2,500 Block Coins</strong></div><button onclick="previewObbyItem('galaxyWings')">PREVIEW</button><button onclick="buyObbyItem('galaxyWings')">BUY</button></div>
+  </div>
+  <p class="shop-note">The preview is free. Block Coins are only spent when you press BUY.</p>
+ </div>
+</div>
 
 <div id="menu">
  <div class="panel">
@@ -226,6 +278,8 @@ button {
  <div class="stat" id="mode">🌎 WORLD</div>
  <div class="stat" id="health">❤️ 100</div>
  <div class="stat" id="coins">🪙 0</div>
+ <div class="stat" id="blockCoins" style="display:none">🪙 0 Block Coins</div>
+ <button id="obbyShopButton" onclick="openObbyShop()" style="display:none">🛍️ UGC SHOP</button>
  <div class="stat" id="level">⭐ Level 1</div>
  <button id="shootButton" onclick="shoot()" style="display:none;background:#d94b35">🔫 SHOOT (F)</button>
  <button id="menuButton" onclick="goMenu()">☰ MENU</button>
@@ -351,6 +405,18 @@ let uncollectedCash = 0;
 let keys={},touch={},objects=[],coins=0,health=100,level=1;
 let speed=5,vy=0,onGround=false,buildings=0,frame=0;
 let avatarColor=0x3479ee, avatarStyle='classic', car=null, targets=[], shots=[];
+let avatarGender=localStorage.getItem('bwAvatarGender')||'';
+let blockCoins=Number(localStorage.getItem('bwBlockCoins')||0);
+let obbyCheckpoint={x:0,y:.2,z:5};
+let obbyTowerStarted=0;
+let obbyTowerDuration=600;
+let obbyRewarded=false;
+let obbyStage=0;
+let obbyHitCooldown=0;
+let obbyShopOpen=false,obbyShopOpenedAt=0;
+let obbyMovingParts=[];
+let obbyDisappearParts=[];
+let obbyAccessory=localStorage.getItem('bwObbyAccessory')||'';
 let clock=new THREE.Clock();
 
 function cube(x,y,z,w,h,d,mat,group=scene){
@@ -375,97 +441,101 @@ function addObject(o){
 
 function makePlayer(){
  const g=new THREE.Group();
+ const skinTone=material(0xffc18b); // Exactly the same skin tone for boy and girl.
+ const hairMain=material(avatarGender==='girl'?0x9c351b:0x60351f);
+ const hairLight=material(avatarGender==='girl'?0xd85a2b:0x8a502d);
+ const black=material(0x151c28);
+ const blueShirt=material(0x1678bd);
+ const jacket=material(avatarGender==='girl'?0x176c82:0x171b22);
+ const pants=material(avatarGender==='girl'?0x673c55:0x172536);
 
- // BODY
- const shirt=cube(0,1.15,0,.85,.95,.48,material(avatarColor),g);
- g.userData.shirt=shirt;
+ // Roblox-inspired block torso with a visible shirt front.
+ const torso=cube(0,1.22,0,.82,.92,.42,jacket,g);
+ g.userData.shirt=torso;
+ if(avatarGender==='girl'){
+  cube(0,1.22,.216,.34,.82,.035,material(0xe5e1d8),g);
+  for(let i=0;i<5;i++)cube(0,0.88+i*.16,.24,.34,.035,.018,material(0x8b9197),g);
+  cube(0,1.22,.245,.045,.76,.025,material(0x1a91a4),g);
+  for(const side of [-1,1])cube(side*.34,1.22,.22,.12,.84,.035,material(0x23879a),g);
+ }else{
+  cube(0,1.22,.224,.43,.82,.035,blueShirt,g);
+  cube(-.31,1.22,.225,.2,.86,.05,jacket,g);
+  cube(.31,1.22,.225,.2,.86,.05,jacket,g);
+  cube(0,1.63,.25,.52,.12,.05,jacket,g);
+ }
 
- // ROUND HEAD
- const head=new THREE.Mesh(
-  new THREE.SphereGeometry(.38,24,24),
-  skin
- );
-head.position.x=0;
-head.position.y=1.95;
-head.position.z=0;
- head.castShadow=true;
- g.add(head);
+ // Neck and rounded head.
+ const neck=new THREE.Mesh(new THREE.CylinderGeometry(.14,.14,.2,12),skinTone);
+ neck.position.set(0,1.75,0);g.add(neck);
+ const head=new THREE.Mesh(new THREE.SphereGeometry(.39,28,20),skinTone);
+ head.position.set(0,2.12,0);head.castShadow=true;g.add(head);
 
- // EYES
- const eyeMat=material(0x172033);
- const eye1=new THREE.Mesh(new THREE.SphereGeometry(.045,12,12),eyeMat);
- eye1.position.set(-.14,2,.34);
- g.add(eye1);
+ // Face is on the FRONT (+Z) and kept clear of the fringe.
+ const eyeMat=material(0x24202a);
+ for(const x of [-.135,.135]){
+  const eye=new THREE.Mesh(new THREE.SphereGeometry(.043,12,10),eyeMat);
+  eye.scale.set(.8,1.2,.55);
+  eye.position.set(x,2.14,.371);g.add(eye);
+ }
+ const smileCurve=new THREE.CatmullRomCurve3([
+  new THREE.Vector3(-.115,1.98,.365),
+  new THREE.Vector3(-.06,1.94,.386),
+  new THREE.Vector3(0,1.93,.39),
+  new THREE.Vector3(.06,1.94,.386),
+  new THREE.Vector3(.115,1.98,.365)
+ ]);
+ const smile=new THREE.Mesh(new THREE.TubeGeometry(smileCurve,16,.018,6,false),eyeMat);
+ g.add(smile);
 
- const eye2=eye1.clone();
- eye2.position.x=.14;
- g.add(eye2);
-
- // SMILE
- const smile=cube(0,1.82,.365,.15,.025,.025,dark,g);
-
- // HAIR
- const hair=material(0x382315);
- const hairCap=new THREE.Mesh(
-  new THREE.SphereGeometry(.39,20,12,0,Math.PI*2,0,Math.PI/2),
-  hair
- );
- hairCap.position.set(0,2.08,0);
- g.add(hairCap);
-
- // ARMS WITH SHOULDER JOINTS
- const arms=[];
- const armMat=skin;
-
+ // Thick, swept bacon locks frame the head but never cover the eyes or smile.
+ const cap=new THREE.Mesh(new THREE.SphereGeometry(.405,28,16,0,Math.PI*2,0,Math.PI/2),hairMain);
+ cap.position.set(0,2.22,0);g.add(cap);
+ function hairLock(x,y,z,sx,sy,sz,rot=0,mat=hairMain){
+  const m=new THREE.Mesh(new THREE.SphereGeometry(1,16,12),mat);
+  m.position.set(x,y,z);m.scale.set(sx,sy,sz);m.rotation.z=rot;m.castShadow=true;g.add(m);
+ }
+ // Side curls.
  for(const side of [-1,1]){
-  const arm=new THREE.Group();
-  arm.position.x=side*.53;
-arm.position.y=1.55;
-arm.position.z=0;
+  hairLock(side*.34,2.06,.12,.18,.31,.22,side*-.18,hairMain);
+  hairLock(side*.32,2.25,.18,.17,.22,.2,side*-.25,hairLight);
+ }
+ if(avatarGender==='boy'){
+  // Boy: thick brown swept bacon fringe with separate curved locks.
+  hairLock(-.18,2.34,.285,.16,.28,.14,-.48,hairLight);
+  hairLock(-.03,2.29,.31,.15,.25,.13,-.12,hairMain);
+  hairLock(.13,2.34,.27,.16,.25,.14,.35,hairLight);
+  hairLock(.27,2.29,.20,.13,.22,.13,.55,hairMain);
+ }else{
+  // Girl: auburn side-swept fringe and a tied-up bun at the back.
+  const bun=new THREE.Mesh(new THREE.SphereGeometry(.25,18,14),hairMain);
+  bun.position.set(0,2.57,-.12);g.add(bun);
+  hairLock(-.18,2.34,.29,.18,.27,.15,-.62,hairLight);
+  hairLock(-.02,2.29,.32,.17,.24,.14,-.25,hairMain);
+  hairLock(.14,2.33,.27,.18,.26,.15,.28,hairLight);
+  hairLock(.32,2.08,.02,.13,.31,.16,.18,hairMain);
+ }
 
-  const upper=new THREE.Mesh(
-   new THREE.CapsuleGeometry(.14,.55,5,12),
-   armMat
-  );
-  upper.position.y=-.38;
-  upper.castShadow=true;
-  arm.add(upper);
-
-  const hand=new THREE.Mesh(
-   new THREE.SphereGeometry(.15,16,12),
-   skin
-  );
-  hand.position.y=-.78;
-  arm.add(hand);
-
-  g.add(arm);
-  arms.push(arm);
+ // Smooth cylindrical arms and simple Roblox block legs.
+ const arms=[];
+ for(const side of [-1,1]){
+  const arm=new THREE.Group();arm.position.set(side*.52,1.53,0);
+  const upper=new THREE.Mesh(new THREE.CapsuleGeometry(.135,.52,5,12),skinTone);
+  upper.position.y=-.38;arm.add(upper);
+  const hand=new THREE.Mesh(new THREE.SphereGeometry(.14,14,12),skinTone);
+  hand.position.set(0,-.77,.015);arm.add(hand);
+  g.add(arm);arms.push(arm);
  }
  g.userData.arms=arms;
-
- // LEGS WITH HIP JOINTS
  const legs=[];
-
  for(const side of [-1,1]){
-  const leg=new THREE.Group();
-leg.position.set(side*.22,.72,0);
-
-  const legMesh=new THREE.Mesh(
-   new THREE.CapsuleGeometry(.17,.45,5,12),
-   dark
-  );
-  legMesh.position.y=-.35;
-  legMesh.castShadow=true;
-  leg.add(legMesh);
-
-  const shoe=cube(0,-.68,.09,.34,.2,.48,material(0x202b42),leg);
-
-  g.add(leg);
-  legs.push(leg);
+  const leg=new THREE.Group();leg.position.set(side*.21,.72,0);
+  cube(0,-.32,0,.36,.78,.42,pants,leg);
+  cube(0,-.72,.075,.38,.2,.5,black,leg);
+  g.add(leg);legs.push(leg);
  }
-
  g.userData.legs=legs;
-
+ const equipped=createObbyAccessory(obbyAccessory);
+ if(equipped){g.add(equipped);g.userData.obbyAccessory=equipped;}
  addObject(g);
  return g;
 }
@@ -489,6 +559,112 @@ function changeAvatarStyle(value){
   }
   say(value==='robot'?'🤖 Robot avatar selected!':value==='sport'?'🏃 Sport avatar selected!':'🙂 Classic avatar selected!');
  }
+}
+
+function createObbyAccessory(item){
+ if(!item)return null;
+ const g=new THREE.Group();
+ const goldMat=material(0xffd12e),pinkMat=material(0xff65b8),darkMat=material(0x172033);
+ const cyanMat=material(0x35ddff),purpleMat=material(0x8d5cff),whiteMat=material(0xffffff);
+ if(item==='beanie'){
+  const hat=new THREE.Mesh(new THREE.SphereGeometry(.39,20,12,0,Math.PI*2,0,Math.PI/2),material(0x2e79d2));
+  hat.scale.y=.45;hat.position.y=2.36;g.add(hat);
+  const rim=cube(0,2.29,0,.78,.12,.78,material(0x194c91),g);
+  const pom=new THREE.Mesh(new THREE.SphereGeometry(.1,12,10),whiteMat);pom.position.set(0,2.55,0);g.add(pom);
+ }else if(item==='pinkBow'){
+  cube(-.22,2.43,.08,.28,.19,.13,pinkMat,g);cube(.22,2.43,.08,.28,.19,.13,pinkMat,g);
+  cube(0,2.43,.16,.14,.14,.12,goldMat,g);
+ }else if(item==='coolGlasses'){
+  cube(0,2.14,.385,.66,.12,.07,darkMat,g);
+  cube(-.16,2.14,.423,.22,.16,.05,cyanMat,g);cube(.16,2.14,.423,.22,.16,.05,cyanMat,g);
+  cube(0,2.14,.45,.1,.045,.045,darkMat,g);
+ }else if(item==='neonHeadphones'){
+  const band=new THREE.Mesh(new THREE.TorusGeometry(.405,.065,8,28,Math.PI),cyanMat);
+  band.rotation.z=Math.PI;band.position.set(0,2.19,0);g.add(band);
+  cube(-.4,2.02,0,.16,.34,.23,pinkMat,g);cube(.4,2.02,0,.16,.34,.23,pinkMat,g);
+ }else if(item==='goldCrown'){
+  cube(0,2.51,0,.66,.16,.62,goldMat,g);
+  for(let i=-1;i<=1;i++){
+   const point=new THREE.Mesh(new THREE.ConeGeometry(.09,.22,5),goldMat);
+   point.position.set(i*.22,2.69,0);g.add(point);
+  }
+ }else if(item==='halo'){
+  const halo=new THREE.Mesh(new THREE.TorusGeometry(.43,.065,10,36),goldMat);
+  halo.position.set(0,2.63,0);halo.rotation.x=.12;g.add(halo);
+ }else if(item==='galaxyWings'){
+  for(const side of [-1,1]){
+   const wing=new THREE.Mesh(new THREE.SphereGeometry(.5,16,12),side===1?purpleMat:cyanMat);
+   wing.scale.set(.58,.82,.18);wing.position.set(side*.56,1.47,-.22);
+   wing.rotation.z=side*-.42;g.add(wing);
+   for(let j=0;j<3;j++){
+    const feather=new THREE.Mesh(new THREE.SphereGeometry(.2,12,10),j%2?pinkMat:whiteMat);
+    feather.scale.set(.7,1.5,.7);feather.position.set(side*(.42+j*.14),1.2-j*.12,-.3);g.add(feather);
+   }
+  }
+ }
+ return g;
+}
+function removeAvatarPreview(){
+ if(!player)return;
+ if(player.userData.previewAccessory){
+  player.remove(player.userData.previewAccessory);
+  player.userData.previewAccessory=null;
+ }
+ if(player.userData.obbyAccessory)player.userData.obbyAccessory.visible=true;
+}
+function previewObbyItem(item){
+ if(!player){say('Start the Obby first to preview your avatar!');return;}
+ if(player.userData.previewAccessory)player.remove(player.userData.previewAccessory);
+ if(player.userData.obbyAccessory)player.userData.obbyAccessory.visible=false;
+ const preview=createObbyAccessory(item);
+ if(preview){player.add(preview);player.userData.previewAccessory=preview;}
+ const labels={beanie:'Starter Beanie',pinkBow:'Pink Bow',coolGlasses:'Cool Shades',neonHeadphones:'Neon Headphones',goldCrown:'Golden Crown',halo:'Celestial Halo',galaxyWings:'Galaxy Wings'};
+ document.getElementById('shopPreviewText').textContent='PREVIEWING: '+labels[item]+'. This is on your avatar now — BUY only when you like it.';
+}
+function openObbyShop(){
+ if(!player){say('Start the Obby first to preview your avatar!');return;}
+ if(!obbyShopOpen){obbyShopOpen=true;obbyShopOpenedAt=performance.now();}
+ document.getElementById('obbyShop').style.display='flex';
+ document.getElementById('blockCoinShopBalance').textContent='🪙 '+blockCoins+' Block Coins';
+}
+function closeObbyShop(){
+ removeAvatarPreview();
+ if(obbyShopOpen){
+  obbyTowerStarted+=performance.now()-obbyShopOpenedAt;
+  obbyShopOpen=false;
+ }
+ document.getElementById('obbyShop').style.display='none';
+}
+function buyObbyItem(item){
+ const prices={beanie:75,pinkBow:250,coolGlasses:500,neonHeadphones:900,goldCrown:1400,halo:1800,galaxyWings:2500};
+ const labels={beanie:'Starter Beanie',pinkBow:'Pink Bow',coolGlasses:'Cool Shades',neonHeadphones:'Neon Headphones',goldCrown:'Golden Crown',halo:'Celestial Halo',galaxyWings:'Galaxy Wings'};
+ const price=prices[item];
+ if(!price){say('That item is not available.');return;}
+ let owned=[];
+ try{owned=JSON.parse(localStorage.getItem('bwOwnedAccessories')||'[]');}catch(e){owned=[];}
+ if(owned.includes(item)){say('You already own this accessory!');return;}
+ if(blockCoins<price){say('You need '+(price-blockCoins)+' more Block Coins for '+labels[item]+'!');return;}
+ blockCoins-=price;owned.push(item);
+ localStorage.setItem('bwOwnedAccessories',JSON.stringify(owned));
+ localStorage.setItem('bwBlockCoins',String(blockCoins));
+ obbyAccessory=item;localStorage.setItem('bwObbyAccessory',item);
+ if(player){
+  if(player.userData.previewAccessory)player.remove(player.userData.previewAccessory);
+  if(player.userData.obbyAccessory)player.remove(player.userData.obbyAccessory);
+  const equipped=createObbyAccessory(item);
+  if(equipped){player.add(equipped);player.userData.obbyAccessory=equipped;}
+  player.userData.previewAccessory=null;
+ }
+ document.getElementById('blockCoinShopBalance').textContent='🪙 '+blockCoins+' Block Coins';
+ document.getElementById('shopPreviewText').textContent='✨ '+labels[item]+' unlocked and equipped!';
+ updateHUD();say('✨ '+labels[item]+' unlocked!');
+}
+function awardObbyCompletion(){
+ if(obbyRewarded)return;
+ obbyRewarded=true;
+ blockCoins+=100;
+ localStorage.setItem('bwBlockCoins',String(blockCoins));
+ updateHUD();
 }
 
 function makeCar(){
@@ -864,6 +1040,139 @@ const wood = material(0x9b6238);
  }
 }
 
+function buildObbyTower(){
+ const frameMat=material(0x777f89);
+ const railMat=material(0x525b66);
+ const lavaMat=material(0xff3828);
+ const palettes=[
+  [0xffae2e,0xffd84c,0xff762e,0xffef8b],
+  [0x24d77b,0x27b8a0,0x69efac,0x1b91a0],
+  [0x9b62ff,0xe14fff,0x6485ff,0xd36dff],
+  [0xff4f83,0xff83bd,0x43d8ff,0x69f6ff]
+ ];
+ obbyMovingParts=[];obbyDisappearParts=[];
+ obbyCheckpoint={x:0,y:.2,z:3.4};obbyStage=0;obbyHitCooldown=0;
+ const startPad=platform(0,-.1,0,9,9,material(0x38ca82));
+ startPad.userData.startPad=true;
+
+ // Grey outer tower frame: corner walls, tall support columns and ring rails.
+ const wallMat=new THREE.MeshStandardMaterial({color:0x737b86,roughness:.88,transparent:true,opacity:.24});
+ const walls=[
+  cube(-9,18,0,.42,38,18,wallMat),cube(9,18,0,.42,38,18,wallMat),
+  cube(0,18,-9,18,38,.42,wallMat),cube(0,18,9,18,38,.42,wallMat)
+ ];
+ for(const w of walls){w.userData.solid=true;w.userData.width=w.geometry.parameters.width;w.userData.height=w.geometry.parameters.height;w.userData.depth=w.geometry.parameters.depth;objects.push(w);}
+ for(let i=0;i<8;i++){
+  const a=i*Math.PI/4;
+  const post=new THREE.Mesh(new THREE.CylinderGeometry(.18,.18,38,10),railMat);
+  post.position.set(Math.cos(a)*9.35,18.8,Math.sin(a)*9.35);
+  post.castShadow=true;addObject(post);
+ }
+ for(let y=0;y<=36;y+=6){
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(9.35,.12,8,64),railMat);
+  ring.rotation.x=Math.PI/2;ring.position.y=y;addObject(ring);
+ }
+ // Four vivid section hoops make the tower feel like stacked randomized stages.
+ const sectionColours=[0xffad29,0x38db88,0x9d61ff,0x39d9ff];
+ for(let section=0;section<4;section++){
+  const yBase=section*8.4;
+  const glass=new THREE.MeshStandardMaterial({color:sectionColours[section],emissive:sectionColours[section],emissiveIntensity:.18,transparent:true,opacity:.12,side:THREE.DoubleSide,roughness:.3});
+  const shell=new THREE.Mesh(new THREE.CylinderGeometry(7.6,7.6,8.15,48,1,true),glass);
+  shell.position.y=yBase+4.1;addObject(shell);
+  for(const y of [yBase+.12,yBase+8.05]){
+   const hoop=new THREE.Mesh(new THREE.TorusGeometry(7.6,.2,10,64),material(sectionColours[section]));
+   hoop.rotation.x=Math.PI/2;hoop.position.y=y;addObject(hoop);
+  }
+  // Bright vertical strips give each tower section its own colour theme.
+  for(let strip=0;strip<8;strip++){
+   const a=strip*Math.PI/4;
+   const lightBar=cube(Math.cos(a)*7.58,yBase+4.1,Math.sin(a)*7.58,.1,7.5,.1,material(sectionColours[section]));
+   lightBar.rotation.y=-a;objects.push(lightBar);
+  }
+ }
+
+ const offset=Math.random()*Math.PI*2;
+ const stepAngle=.53+Math.random()*.08;
+ const radius=4.4+Math.random()*.5;
+ const verticalStep=.94+Math.random()*.04;
+ const spawnRadius=radius-2.2;
+ const spawnX=Math.cos(offset)*spawnRadius;
+ const spawnZ=Math.sin(offset)*spawnRadius;
+ obbyCheckpoint={x:spawnX,y:.2,z:spawnZ};
+ if(player)player.position.set(spawnX,.2,spawnZ);
+ const finishPalette=palettes[Math.floor(Math.random()*palettes.length)];
+ for(let i=1;i<=32;i++){
+  const angle=offset+i*stepAngle;
+  const x=Math.cos(angle)*radius;
+  const z=Math.sin(angle)*radius;
+  const y=i*verticalStep;
+  const width=i<9?3.25:i<21?2.85:2.45;
+  const checkpoint=i%4===0;
+  const section=Math.floor((i-1)/8);
+  const colour=checkpoint?0x35f29c:palettes[section][(i+Math.floor(Math.random()*2))%4];
+  const pad=platform(x,y,z,width,width,material(colour));
+  pad.userData.stage=i;
+  if(checkpoint){
+   pad.userData.checkpoint=i;
+   // Bright checkpoint beacon, easy to recognize.
+   const pole=cube(x+width*.34,y+1.0,z,.12,1.9,.12,material(0xeafff3));
+   const flag=cube(x+width*.34+.35,y+1.65,z,.75,.42,.08,material(0x26ff9b));
+   const glow=new THREE.PointLight(0x26ff9b,1.8,5);glow.position.set(x,y+1.7,z);scene.add(glow);objects.push(glow);
+  }
+  // A new obstacle pattern in every stage section.
+  if(i%4===2 || i%7===5){
+   const laserMat=new THREE.MeshStandardMaterial({color:0xff286f,emissive:0xff0750,emissiveIntensity:2.4,metalness:.25,roughness:.25});
+   const beam=cube(x,y+1.23,z,width+1.15,.2,.24,laserMat);
+   beam.userData.hazard=true;beam.userData.width=width+1.15;beam.userData.depth=.24;beam.userData.height=.2;beam.userData.spinning=true;
+   beam.userData.hit=true;objects.push(beam);obbyMovingParts.push(beam);
+  }else if(i%6===3){
+   const laserMat=new THREE.MeshStandardMaterial({color:0xff315d,emissive:0xff153f,emissiveIntensity:2.1,metalness:.2,roughness:.3});
+   const beam=cube(x,y+1.2,z,width-.25,.18,.22,laserMat);
+   beam.userData.hazard=true;beam.userData.width=width-.25;beam.userData.depth=.22;beam.userData.height=.18;objects.push(beam);
+  }
+  // Disappearing pads in purple and cyan sections.
+  if((section===2||section===3)&&i%5===1){
+   pad.userData.disappear=true;
+   obbyDisappearParts.push({mesh:pad,elapsed:0,hidden:false});
+  }
+  // A few moving pads: clearly visible lateral movement, not fake decoration.
+  if((i===11||i===29)&&!checkpoint){
+   pad.userData.moving=true;pad.userData.baseX=x;pad.userData.baseZ=z;pad.userData.movePhase=i*1.7;
+   obbyMovingParts.push(pad);
+  }
+  // Tiny gold studs along the route mark the intended jump direction.
+  if(i%2===0){
+   const stud=new THREE.Mesh(new THREE.SphereGeometry(.12,10,8),material(0xffe06b));
+   stud.position.set(x,y+.42,z);addObject(stud);
+  }
+ }
+ // Golden summit is in the centre; players must finish the last jump.
+ const finish=platform(0,31.2,0,5.8,5.8,material(0xffd348));
+ finish.userData.finishPad=true;
+ const beacon=new THREE.Mesh(new THREE.CylinderGeometry(.18,.32,3.8,12),material(0xfff0a2));
+ beacon.position.set(0,33.8,0);addObject(beacon);
+ for(let i=0;i<6;i++){
+  const star=new THREE.Mesh(new THREE.OctahedronGeometry(.32),material(finishPalette[i%finishPalette.length]));
+  const a=i*Math.PI/3;star.position.set(Math.cos(a)*2.2,34.6,Math.sin(a)*2.2);addObject(star);
+ }
+ // Lava basin below the tower. Falling resets without taking health.
+ const lava=platform(0,-4.7,0,19,19,lavaMat);
+ lava.userData.hazard=true;lava.userData.width=19;lava.userData.depth=19;lava.userData.height=.6;
+ obbyTowerStarted=performance.now();
+ obbyRewarded=false;
+ const obj=document.getElementById('objective');
+ obj.textContent='🗼 TOWER OF HELL • Climb 32 stages • Green pads are checkpoints';
+}
+function respawnObby(reason='You fell!'){
+ if(mode!=='obby'||!player)return;
+ player.position.set(obbyCheckpoint.x,obbyCheckpoint.y,obbyCheckpoint.z);
+ vy=0;onGround=true;
+ // Release held movement so a fall cannot instantly carry the player off again.
+ for(const k in keys)keys[k]=false;
+ for(const k in touch)touch[k]=false;
+ say(reason+' Back to checkpoint '+(obbyStage||'START')+'!');
+}
+
 function start(selected){
  mode=selected;
  coins=0;
@@ -889,89 +1198,10 @@ document.getElementById('mailboxCash').textContent =
 if(mode !== 'obby') buildWorld();
 
  player=makePlayer();
- player.position.set(0,.2,5);
+ player.position.set(0,.2,3.4);
 
 if(mode==='obby'){
-
- const colours=[
-  0xff315c,0xff922e,0xffe34d,0x38e878,
-  0x28d9ff,0x526bff,0xb34cff,0xff55d4
- ];
-
- const course=[
-  [0,-.1,3,8,8],
-  [2,.25,-2,3.5,3.5],
-  [-1,.6,-6,3.5,3.5],
-  [2,.95,-10,3.5,3.5],
-  [4,1.3,-14,3.5,3.5],
-  [1,1.65,-18,3.5,3.5],
-  [-2,2,-22,3.5,3.5],
-  [1,2.35,-26,3.5,3.5],
-  [4,2.7,-30,3.5,3.5],
-  [1,3.05,-34,3.5,3.5],
-  [-2,3.4,-38,3.5,3.5],
-  [1,3.75,-42,3.5,3.5],
-  [4,4.1,-46,3.5,3.5],
-  [1,4.45,-50,3.5,3.5],
-  [-2,4.8,-54,3.5,3.5],
-  [1,5.15,-58,3.5,3.5],
-  [4,5.5,-62,3.5,3.5],
-  [1,5.85,-66,3.5,3.5],
-  [-2,6.2,-70,3.5,3.5],
-  [0,6.55,-74,12,10]
- ];
-
- course.forEach((p,i)=>{
-  const colour=material(colours[i%colours.length]);
-
-  platform(p[0],p[1],p[2],p[3],p[4],colour);
-
-  cube(
-   p[0],p[1]-.32,p[2],
-   p[3]+.15,.12,p[4]+.15,dark
-  );
-
-  if(i%2===0) makeCoin(p[0],p[2]);
- });
-
- // Lava pits below the course
- const lava=material(0xff351f);
-
-for(let i=0;i<7;i++){
-  const lavaBlock=cube(
-    (i%2===0?-1:1)*5,
-    -.65,
-    -12-i*9,
-    5,.15,5,lava
-  );
-
-  lavaBlock.userData.hazard=true;
-  objects.push(lavaBlock);
-}
- // Neon hazard walls
- const neon=material(0xff39db);
- for(let i=0;i<6;i++){
-  const z=-18-i*9;
-solidCube(-7,2.5,z,.25,5,2,neon);
-solidCube(7,2.5,z,.25,5,2,neon);
- }
-
- // Giant finish arch
- cube(0,9,-82,12,.7,.7,gold);
- cube(-6,7,-82,.7,4,.7,purple);
- cube(6,7,-82,.7,4,.7,purple);
-
- // Finish decorations
- for(let i=0;i<8;i++){
-  const a=i*Math.PI/4;
-  const star=cube(
-   Math.cos(a)*4,
-   9,
-   -82+Math.sin(a)*4,
-   .5,.5,.5,
-   material(colours[i])
-  );
- }
+ buildObbyTower();
 
 }else if(mode==='simulator'){
   for(let i=0;i<25;i++){
@@ -1067,7 +1297,7 @@ solidCube(7,2.5,z,.25,5,2,neon);
  document.getElementById('objective').style.display='block';
  document.getElementById('mode').textContent=selected.toUpperCase();
  const goals={
-obby:'🌈 Complete 20 platforms and reach the giant finish arch!',
+obby:'🗼 Climb 32 randomized stages. Green pads save checkpoints. Reach the golden summit!',
   simulator:'Collect coins and upgrade your speed!',
   survival:'Avoid danger and collect coins!',
 tycoon:'🏡 Choose your dream house, build it and collect money from your mailbox!',
@@ -1083,11 +1313,14 @@ tycoon:'🏡 Choose your dream house, build it and collect money from your mailb
  };
  document.getElementById('objective').textContent=goals[selected];
  document.getElementById('shootButton').style.display=selected==='shooter'?'block':'none';
+ document.getElementById('blockCoins').style.display=selected==='obby'?'block':'none';
+ document.getElementById('obbyShopButton').style.display=selected==='obby'?'block':'none';
  playing=true;
  updateHUD();
 }
  function updateHUD(){
- document.getElementById('health').textContent='❤️ '+health;
+ document.getElementById('health').textContent=mode==='obby'?'❤️ No health loss':'❤️ '+health;
+ document.getElementById('blockCoins').textContent='🪙 '+blockCoins+' Block Coins';
  document.getElementById('coins').textContent='🪙 '+coins;
  document.getElementById('level').textContent='⭐ Level '+level;
 }
@@ -1101,7 +1334,7 @@ function say(text){
 
 function jump(){
  if(playing&&onGround){
-  vy=10.5;
+  vy=mode==='obby'?11.5:10.5;
   onGround=false;
  }
 }
@@ -1133,6 +1366,8 @@ window.interact=interact;
 window.start=start;
 window.goMenu=()=>{
  playing=false;
+ closeObbyShop();
+ closeObbyShop();
  document.getElementById('menu').style.display='flex';
  document.getElementById('hud').style.display='none';
  document.getElementById('tycoonPanel').style.display='none';
@@ -1205,6 +1440,9 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
   player.position.y=-10;
  }else{
   const previousFeet=player.position.y;
+  if(mode==='obby' && (Math.abs(dx)+Math.abs(dz))>.01){
+   player.rotation.y=Math.atan2(dx,dz);
+  }
 
   // Move one axis at a time; solid walls and platform sides block entry.
   const minX=mode==='obby'?-8:-23;
@@ -1216,7 +1454,7 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
    const playerBottom=player.position.y+.04;
    const playerTop=player.position.y+2.15;
    for(const o of objects){
-    if(!o.userData.solid&&!o.userData.platform)continue;
+    if(!o.userData.solid)continue;
     const insideX=Math.abs(testX-o.position.x)<o.userData.width/2+.36;
     const insideZ=Math.abs(testZ-o.position.z)<o.userData.depth/2+.36;
     const blockBottom=o.position.y-o.userData.height/2;
@@ -1239,7 +1477,7 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
   let landingHeight=null;
   if(vy<=0){
    for(const o of objects){
-    if(!o.userData.platform)continue;
+    if(!o.userData.platform||!o.visible)continue;
     const top=o.position.y+.3;
     const w=o.geometry.parameters.width/2;
     const d=o.geometry.parameters.depth/2;
@@ -1257,25 +1495,32 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
    onGround=true;
   }
   if(mode==='obby'){
-  for(const o of objects){
-    if(o.userData.hazard && o.visible){
-      const touching =
-        Math.abs(player.position.x-o.position.x)<2.8 &&
-        Math.abs(player.position.z-o.position.z)<2.8 &&
-        player.position.y<-.3;
-
-      if(touching){
-        health-=10;
-        player.position.set(0,0,5);
-        vy=0;
-        say('🔥 Lava! -10 health');
-        if(health<=0)gameOver();
-        break;
-      }
+   const now=performance.now();
+   if(player.position.y < -2.8 && now>obbyHitCooldown){
+    obbyHitCooldown=now+950;
+    respawnObby('🔥 You fell');
+   }else if(now>obbyHitCooldown){
+    // Rotated laser collision is tested in the laser's own local space.
+    for(const o of objects){
+     if(!o.userData.hazard||!o.visible||o.userData.width===undefined)continue;
+     if(o.position.y < -2)continue; // The lava basin is handled by the fall reset above.
+     const dx=player.position.x-o.position.x;
+     const dz=player.position.z-o.position.z;
+     const a=o.rotation?.y||0;
+     const localX=Math.cos(a)*dx-Math.sin(a)*dz;
+     const localZ=Math.sin(a)*dx+Math.cos(a)*dz;
+     const verticalOverlap=(player.position.y+2.0)>(o.position.y-o.userData.height/2) &&
+       (player.position.y+.15)<(o.position.y+o.userData.height/2);
+     if(verticalOverlap &&
+       Math.abs(localX)<o.userData.width/2+.32 &&
+       Math.abs(localZ)<o.userData.depth/2+.3){
+      obbyHitCooldown=now+950;
+      respawnObby('⚡ Laser hit');
+      break;
+     }
     }
-  }
-}
-  if(player.position.y< -12){
+   }
+  }else if(player.position.y< -12){
    player.position.set(0,0,5);
    vy=0;
    health-=10;
@@ -1313,10 +1558,50 @@ if(mode === 'tycoon' && houseBuilt && frame % 300 === 0){
   if(health<=0)gameOver();
  }
 
- if(mode==='obby'&&player.position.z< -80&&player.position.y>5){
-  coins+=50;
-  say('🏆 OBBY COMPLETE! +50 COINS');
-  playing=false;
+ if(mode==='obby'){
+  if(frame%30===0){
+   const left=Math.max(0,Math.ceil(obbyTowerDuration-(performance.now()-obbyTowerStarted)/1000));
+   document.getElementById('objective').textContent='🗼 TOWER OF HELL • '+Math.floor(left/60)+':'+String(left%60).padStart(2,'0')+' until tower randomizes • Stage '+obbyStage+'/32';
+  }
+  // A green checkpoint only saves when your feet have landed on it.
+  for(const o of objects){
+   if(o.userData.checkpoint && onGround &&
+      Math.abs(player.position.x-o.position.x)<o.userData.width/2+.12 &&
+      Math.abs(player.position.z-o.position.z)<o.userData.depth/2+.12 &&
+      Math.abs(player.position.y-(o.position.y+.3))<.12 &&
+      o.userData.checkpoint>obbyStage){
+    obbyCheckpoint={x:o.position.x,y:o.position.y+.3,z:o.position.z};
+    obbyStage=o.userData.checkpoint;
+    say('✅ CHECKPOINT '+obbyStage+' SAVED!');
+   }
+  }
+  // The gold centre platform is the finish. The reward is only given once.
+  if(onGround && player.position.y>=31.45 && Math.hypot(player.position.x,player.position.z)<2.9){
+   awardObbyCompletion();
+   playing=false;
+   say('🏆 TOWER COMPLETE! +100 BLOCK COINS!');
+  }
+  // A different spiral, colour order and obstacle arrangement every 10 minutes.
+  if((performance.now()-obbyTowerStarted)/1000>=obbyTowerDuration){
+   clearWorld();
+   scene.add(player);objects.push(player);
+   buildObbyTower(); // also places the player at the new randomized spawn
+   vy=0;onGround=true;
+   say('🔄 A brand-new randomized tower is ready!');
+  }
+  for(const part of obbyMovingParts){
+   if(part.userData.spinning)part.rotation.y+=dt*2.6;
+   if(part.userData.moving){
+    const t=performance.now()*.0015+part.userData.movePhase;
+    part.position.x=part.userData.baseX+Math.sin(t)*1.1;
+    part.position.z=part.userData.baseZ+Math.cos(t)*1.1;
+   }
+  }
+  for(const item of obbyDisappearParts){
+   item.elapsed+=dt;
+   if(!item.hidden && item.elapsed>3.5){item.mesh.visible=false;item.hidden=true;item.elapsed=0;}
+   else if(item.hidden && item.elapsed>2.5){item.mesh.visible=true;item.hidden=false;item.elapsed=0;}
+  }
  }
 
  if(mode==='tycoon'&&buildings>0&&frame%300===0){
@@ -1373,7 +1658,7 @@ function gameOver(){
  const dt=Math.min(clock.getDelta(),.04);
 
  if(playing&&player){
-  update(dt);
+  if(!obbyShopOpen)update(dt);
 
   let target=new THREE.Vector3(
    player.position.x,
@@ -1383,27 +1668,43 @@ function gameOver(){
 
   let distance=8;
 
-  if(cameraView===1){
-   camera.position.set(
-    player.position.x,
-    player.position.y+1.8,
-    player.position.z
-   );
-   target.set(
-    player.position.x+Math.sin(cameraYaw)*10,
-    player.position.y+1.8+cameraPitch,
-    player.position.z-Math.cos(cameraYaw)*10
-   );
-
+  if(mode==='obby'){
+   const viewYaw=player.rotation.y+cameraYaw;
+   if(cameraView===1){
+    camera.position.set(player.position.x,player.position.y+1.8,player.position.z);
+    target.set(
+     player.position.x+Math.sin(viewYaw)*10,
+     player.position.y+1.8+cameraPitch,
+     player.position.z+Math.cos(viewYaw)*10
+    );
+   }else{
+    if(cameraView===2)distance=5;
+    if(cameraView===3)distance=8;
+    const cameraSide=cameraView===2?1:-1;
+    camera.position.set(
+     player.position.x+Math.sin(viewYaw)*distance*cameraSide,
+     player.position.y+3.8+cameraPitch*3.5,
+     player.position.z+Math.cos(viewYaw)*distance*cameraSide
+    );
+    target.y=player.position.y+3.2;
+   }
   }else{
-   if(cameraView===2) distance=5;
-   if(cameraView===3) distance=8;
-
-   camera.position.set(
-    player.position.x+Math.sin(cameraYaw)*distance,
-    player.position.y+2+cameraPitch*5,
-    player.position.z+Math.cos(cameraYaw)*distance
-   );
+   if(cameraView===1){
+    camera.position.set(player.position.x,player.position.y+1.8,player.position.z);
+    target.set(
+     player.position.x+Math.sin(cameraYaw)*10,
+     player.position.y+1.8+cameraPitch,
+     player.position.z-Math.cos(cameraYaw)*10
+    );
+   }else{
+    if(cameraView===2)distance=5;
+    if(cameraView===3)distance=8;
+    camera.position.set(
+     player.position.x+Math.sin(cameraYaw)*distance,
+     player.position.y+2+cameraPitch*5,
+     player.position.z+Math.cos(cameraYaw)*distance
+    );
+   }
   }
 
   camera.lookAt(target);
@@ -1441,6 +1742,12 @@ window.meetNPCs = meetNPCs;
 window.changeAvatar = changeAvatar;
 window.changeAvatarStyle = changeAvatarStyle;
 window.shoot = shoot;
+window.chooseGender=chooseGender;
+window.openObbyShop=openObbyShop;
+window.previewObbyItem=previewObbyItem;
+window.closeObbyShop=closeObbyShop;
+window.buyObbyItem=buyObbyItem;
+if(!avatarGender)document.getElementById('genderPicker').style.display='flex';
 animate();
 </script>
 </body>
